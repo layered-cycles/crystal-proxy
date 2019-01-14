@@ -2,5 +2,13 @@
   "name": "crystal-client",
   "version": "0.1.0",
   "private": true,
-  "scripts": {}
+  "workspaces": {
+    "packages": [
+      "Core",
+      "Development"
+    ]
+  },
+  "scripts": {
+    "start-development": "cd Development && yarn start"
+  }
 }

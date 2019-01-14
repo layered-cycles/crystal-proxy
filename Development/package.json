@@ -1,0 +1,16 @@
+{
+  "name": "crystal-client-development",
+  "version": "0.1.0",
+  "main": "Sources/index.js",
+  "private": true,
+  "scripts": {
+    "start": "node Sources/index.js"
+  },
+  "dependencies": {
+    "create-saga-core": "^0.1.2",
+    "node-watch": "^0.6.0",
+    "redux": "^4.0.1",
+    "redux-saga": "^0.16.2",
+    "webpack": "^4.28.4"
+  }
+}
