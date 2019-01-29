@@ -1,13 +1,18 @@
  import Cocoa
  
  class AppDelegate: NSObject, NSApplicationDelegate {
-  func applicationDidFinishLaunching(_ notification: Notification) {
+  func applicationDidFinishLaunching(
+    _ notification: Notification) 
+  {
     let clientCoreBundle =
       try! Core.read(
         scriptAtPath: "./client-core.js")
     Core.launch(
       script: clientCoreBundle,
-      with: [Console.coreService])
+      with: [
+        Console.coreService,
+        UserInterface().coreService
+      ])
   }
 }
 

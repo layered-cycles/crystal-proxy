@@ -99,10 +99,15 @@ function startExecutableSourceWatcher() {
     console.log('starting executable source watcher...')
     console.log('')
     const watcherChannel = eventChannel(emitMessage => {
-      createFileWatcher(['../Mac/Sources'], { recursive: true }, () =>
-        emitMessage({
-          type: 'EXECUTABLE_SOURCE_CHANGED'
-        })
+      createFileWatcher(
+        ['../Mac/Sources'],
+        {
+          recursive: true
+        },
+        () =>
+          emitMessage({
+            type: 'EXECUTABLE_SOURCE_CHANGED'
+          })
       )
       return () => null
     }, buffers.expanding())
