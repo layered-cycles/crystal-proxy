@@ -5,5 +5,5 @@
     [ "log": log ]
   
   static let log: @convention(block) (String) -> Void =
-    { print("JS: \($0)") }
+    { print($0) }
  }

@@ -14,10 +14,39 @@ const crystalTheme = createMuiTheme({
   }
 })
 
+const WidgetContext = React.createContext()
+
 function setupAndRenderWidget(Widget) {
   class RootBehavior extends React.Component {
-    constructor(props) {
-      super(props)
+    state = {
+      postUserMessage: null,
+      widgetState: null
+    }
+
+    componentDidMount() {
+      const webSocket = new WebSocket(`ws://localhost:3001/io`)
+      const postUserMessage = userMessage => {
+        const messageString = JSON.stringify(userMessage)
+        webSocket.send(messageString)
+      }
+      webSocket.addEventListener('open', () => {
+        postUserMessage({
+          type: 'SETUP_WIDGET',
+          payload: {
+            selectWidgetState: `${Widget.selectWidgetState}`
+          }
+        })
+        webSocket.addEventListener('message', messageEvent => {
+          const userInterfaceMessage = JSON.parse(messageEvent.data)
+          switch (userInterfaceMessage.type) {
+            case 'HYDRATE_WIDGET':
+              const { widgetState } = userInterfaceMessage.payload
+              this.setState({ widgetState })
+              return
+          }
+        })
+      })
+      this.setState({ postUserMessage })
     }
 
     render() {
@@ -27,9 +56,14 @@ function setupAndRenderWidget(Widget) {
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
         />,
-        <MuiThemeProvider key="widget-theme-provider" theme={crystalTheme}>
-          <Widget />
-        </MuiThemeProvider>
+        <WidgetContext.Provider
+          key="widget-context-provider"
+          value={this.state}
+        >
+          <MuiThemeProvider theme={crystalTheme}>
+            <Widget />
+          </MuiThemeProvider>
+        </WidgetContext.Provider>
       ]
     }
   }
@@ -42,3 +76,4 @@ function setupAndRenderWidget(Widget) {
 }
 
 export default setupAndRenderWidget
+export { WidgetContext }

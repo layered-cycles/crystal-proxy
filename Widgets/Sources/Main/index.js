@@ -22,11 +22,8 @@ function WidgetDisplay({ displayMode, enterMetaPage, leaveMetaPage }) {
 
 function applyWidgetBehavior(Component) {
   class Instance extends React.Component {
-    constructor(props) {
-      super(props)
-      this.state = {
-        displayMode: DisplayMode.LAYERS
-      }
+    state = {
+      displayMode: DisplayMode.LAYERS
     }
 
     render() {
@@ -51,5 +48,6 @@ function applyWidgetBehavior(Component) {
       })
     }
   }
+  Instance.selectWidgetState = ({ serviceUrl }) => ({ serviceUrl })
   return Instance
 }

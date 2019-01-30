@@ -1,12 +1,49 @@
 import Cocoa
 import JavaScriptCore
 import WebKit
+import Vapor
 
 final class UserInterface {
   var mainWindowController: MainWindowController!
 
-  func setup() {    
+  func setup(userInputMessageHandler: JSValue) {
+    _startWebsocketServer(
+      userInputMessageHandler: userInputMessageHandler) 
     mainWindowController = MainWindowController()
+  }
+
+  func _startWebsocketServer(userInputMessageHandler: JSValue) {
+    let serviceConfig = Config.default()
+    let serviceEnvironment = try! Environment.detect()
+    var serviceServices = Services.default()
+    let serverConfig = NIOServerConfig.default(
+      port: 3001)
+    serviceServices.register(serverConfig)
+    let socketServer = NIOWebSocketServer.default()
+    socketServer.get("io") { 
+      serverSocket, request in
+      self.mainWindowController.viewController.webSocket = serverSocket
+      serverSocket.onText { 
+        clientSocket, messageString in
+        userInputMessageHandler.call(
+          withArguments: [messageString])
+      }
+    }
+    serviceServices.register(
+      socketServer, 
+      as: WebSocketServer.self)
+    let vapor = try! Application(
+      config: serviceConfig, 
+      environment: serviceEnvironment, 
+      services: serviceServices)
+    vapor.asyncRun()
+  }
+
+  func hydrateWidget(widgetState: String) {
+    mainWindowController
+      .viewController
+      .webSocket
+      .send(widgetState)
   }
 }
 
@@ -16,19 +53,27 @@ extension UserInterface: StatefulCoreService {
   }
 
   var api: Core.Service.Api {
-    return ["launch": launch]
+    return [
+      "launch": launch,
+      "hydrate": hydrate
+    ]
   }
 
-  var launch: @convention(block) () -> () {
+  var launch: @convention(block) (JSValue) -> () {
     return self.setup
+  }
+
+  var hydrate: @convention(block) (String) -> () {
+    return self.hydrateWidget
   }
 }
 
 final class MainWindowController: NSWindowController {
+  let viewController =  MainViewController()
+
   init() {
-    let mainWidgetController = MainViewController()
     let mainWidgetWindow = NSWindow(
-      contentViewController: mainWidgetController)
+      contentViewController: viewController)
     let initialWidth = 512.0 * 0.66
     let initialHeight = 550.0
     let initialContentSize = NSSize(
@@ -57,8 +102,9 @@ final class MainWindowController: NSWindowController {
   }
 }
 
-final class MainViewController: NSViewController, WKUIDelegate {
+final class MainViewController: NSViewController, WKUIDelegate {  
   var webView: WKWebView!
+  var webSocket: WebSocket!
 
   override func loadView() {
     let webConfiguration = WKWebViewConfiguration()
@@ -79,8 +125,7 @@ final class MainViewController: NSViewController, WKUIDelegate {
       fileURLWithPath: "./main.widget.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
-    webView
-      .evaluateJavaScript(widgetScript)
+    webView.evaluateJavaScript(widgetScript)
   }
 
   init() {
