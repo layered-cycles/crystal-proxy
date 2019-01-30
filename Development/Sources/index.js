@@ -4,7 +4,8 @@ const { call, spawn, take } = require('redux-saga/effects')
 const { eventChannel, buffers } = require('redux-saga')
 const createFileWatcher = require('node-watch')
 const createBundler = require('webpack')
-const coreWebpackConfig = require('../webpack.config')
+const coreWebpackConfig = require('../core.webpack.config')
+const widgetsWebpackConfig = require('../widgets.webpack.config')
 
 createSagaCore({ initializer })
 
@@ -13,6 +14,7 @@ function* initializer() {
   yield call(updateMacExecutable)
   yield spawn(macExecutableProcessor)
   yield spawn(coreBundleProcessor)
+  yield spawn(widgetsBundleProcessor)
 }
 
 function makeStageDirectory() {
@@ -145,5 +147,38 @@ function startCoreBundler() {
       return () => null
     }, buffers.expanding())
     resolve({ bundlerChannel })
+  })
+}
+
+function* widgetsBundleProcessor() {
+  const { widgetsBundlerChannel } = yield call(startWidgetsBundler)
+  while (true) {
+    yield take(widgetsBundlerChannel)
+    yield call(restartMacExecutable)
+  }
+}
+
+function startWidgetsBundler() {
+  return new Promise(resolve => {
+    console.log('starting widgets bundler...')
+    console.log('')
+    const widgetsBundlerChannel = eventChannel(emitMessage => {
+      const bundler = createBundler(widgetsWebpackConfig)
+      bundler.watch({}, (watchError, watchStats) => {
+        if (watchError) throw watchError
+        const formattedWatchStats = watchStats.toString({
+          chunks: false,
+          colors: true
+        })
+        console.log('widgets output updated...')
+        console.log(formattedWatchStats)
+        console.log('')
+        emitMessage({
+          type: 'WIDGETS_OUTPUT_UPDATED'
+        })
+      })
+      return () => null
+    }, buffers.expanding())
+    resolve({ widgetsBundlerChannel })
   })
 }
