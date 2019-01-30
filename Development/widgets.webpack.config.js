@@ -3,7 +3,7 @@ const Path = require('path')
 module.exports = {
   mode: 'development',
   entry: {
-    main: Path.resolve(__dirname, '../Widgets/Sources/MainWidget.js')
+    main: Path.resolve(__dirname, '../Widgets/Sources/Main/index.js')
   },
   output: {
     filename: '[name].widget.js',
