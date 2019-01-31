@@ -4,11 +4,23 @@ import MetaHeader from './MetaHeader'
 import MetaList from './MetaList'
 import { WidgetContext } from '../setupAndRenderWidget'
 
-function PageDisplay({ classes, leaveMetaPage, serviceUrl, updateServiceUrl }) {
+function PageDisplay({
+  classes,
+  leaveMetaPage,
+  serviceUrl,
+  updateServiceUrl,
+  frameDimensions,
+  updateFrameDimensions
+}) {
   return (
     <div className={classes.pageContainer}>
       <MetaHeader leaveMetaPage={leaveMetaPage} />
-      <MetaList serviceUrl={serviceUrl} updateServiceUrl={updateServiceUrl} />
+      <MetaList
+        serviceUrl={serviceUrl}
+        updateServiceUrl={updateServiceUrl}
+        frameDimensions={frameDimensions}
+        updateFrameDimensions={updateFrameDimensions}
+      />
     </div>
   )
 }
@@ -21,8 +33,10 @@ function applyPageBehavior(Component) {
       return (
         <Component
           serviceUrl={this.context.widgetState.serviceUrl}
+          frameDimensions={this.context.widgetState.frameDimensions}
           leaveMetaPage={this.props.leaveMetaPage}
           updateServiceUrl={this.updateServiceUrl.bind(this)}
+          updateFrameDimensions={this.updateFrameDimensions.bind(this)}
         />
       )
     }
@@ -31,6 +45,13 @@ function applyPageBehavior(Component) {
       this.context.postUserMessage({
         type: 'UPDATE_SERVICE_URL',
         payload: { nextServiceUrl }
+      })
+    }
+
+    updateFrameDimensions(nextFrameDimensions) {
+      this.context.postUserMessage({
+        type: 'UPDATE_FRAME_DIMENSIONS',
+        payload: { nextFrameDimensions }
       })
     }
   }

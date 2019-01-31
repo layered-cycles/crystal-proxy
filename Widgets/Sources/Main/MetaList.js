@@ -11,9 +11,12 @@ function ListDisplay({
   updateServiceUrl,
   dimensionsExpanded,
   toggleDimensionsPanel,
+  frameDimensions,
+  updateFrameDimensions,
   schemaExpanded,
   toggleSchemaPanel
 }) {
+  console.log(frameDimensions)
   return (
     <div className={classes.listContainer}>
       <MetaPanel
@@ -36,7 +39,40 @@ function ListDisplay({
         expanded={dimensionsExpanded}
         onToggle={toggleDimensionsPanel}
         title="Dimensions"
-      />
+      >
+        <TextField
+          value={frameDimensions.width}
+          onChange={changeEvent =>
+            updateFrameDimensions({
+              ...frameDimensions,
+              width: Number(changeEvent.target.value)
+            })
+          }
+          label="Width"
+          variant="outlined"
+          margin="dense"
+          type="number"
+          placeholder="512"
+          required
+          fullWidth
+        />
+        <TextField
+          value={frameDimensions.height}
+          onChange={changeEvent =>
+            updateFrameDimensions({
+              ...frameDimensions,
+              height: Number(changeEvent.target.value)
+            })
+          }
+          label="Height"
+          variant="outlined"
+          margin="normal"
+          type="number"
+          placeholder="512"
+          required
+          fullWidth
+        />
+      </MetaPanel>
       <MetaPanel
         expanded={schemaExpanded}
         onToggle={toggleSchemaPanel}
@@ -59,6 +95,8 @@ function applyListBehavior(Component) {
         <Component
           serviceUrl={this.props.serviceUrl}
           updateServiceUrl={this.props.updateServiceUrl}
+          frameDimensions={this.props.frameDimensions}
+          updateFrameDimensions={this.props.updateFrameDimensions}
           serviceExpanded={this.state.serviceExpanded}
           dimensionsExpanded={this.state.dimensionsExpanded}
           toggleServicePanel={this.toggleServicePanel.bind(this)}

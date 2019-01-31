@@ -48,6 +48,9 @@ function applyWidgetBehavior(Component) {
       })
     }
   }
-  Instance.selectWidgetState = ({ serviceUrl }) => ({ serviceUrl })
+  Instance.selectWidgetState = ({ serviceUrl, frameDimensions }) => ({
+    serviceUrl,
+    frameDimensions
+  })
   return Instance
 }
