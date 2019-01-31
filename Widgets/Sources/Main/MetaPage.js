@@ -1,23 +1,14 @@
 import React from 'react'
-import TextField from '@material-ui/core/TextField'
 import { withStyles } from '@material-ui/core/styles'
 import MetaHeader from './MetaHeader'
+import MetaList from './MetaList'
 import { WidgetContext } from '../setupAndRenderWidget'
 
 function PageDisplay({ classes, leaveMetaPage, serviceUrl, updateServiceUrl }) {
   return (
     <div className={classes.pageContainer}>
       <MetaHeader leaveMetaPage={leaveMetaPage} />
-      <TextField
-        label="Service URL"
-        placeholder="http://localhost:3000"
-        margin="normal"
-        variant="outlined"
-        className={classes.textField}
-        value={serviceUrl}
-        onChange={changeEvent => updateServiceUrl(changeEvent.target.value)}
-        autoFocus={serviceUrl === ''}
-      />
+      <MetaList serviceUrl={serviceUrl} updateServiceUrl={updateServiceUrl} />
     </div>
   )
 }
@@ -57,8 +48,7 @@ const PageDisplayWithStyles = withStyles(theme => ({
     flexDirection: 'column'
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
+    width: '100%'
   }
 }))(PageDisplay)
 
