@@ -11,7 +11,8 @@
       script: clientCoreBundle,
       with: [
         Console.coreService,
-        UserInterface().coreService
+        UserInterface().coreService,
+        CrystalService.coreService
       ])
   }
 }

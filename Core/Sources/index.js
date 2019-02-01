@@ -1,6 +1,7 @@
 import createSagaCore from 'create-saga-core'
 import { spawn, select, call, take, put } from 'redux-saga/effects'
 import UserInterface from './UserInterface'
+import CrystalService from './CrystalService'
 
 createSagaCore({ reducer, initializer })
 
@@ -56,7 +57,6 @@ function* userInputProcessor() {
       case 'UPDATE_SERVICE_URL':
         yield call(handleUpdateServiceUrl, userInputMessage.payload)
         continue
-
       default:
         throw Error(
           `Unrecognized user input message type: ${userInputMessage.type}`
@@ -75,7 +75,11 @@ function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
 }
 
 function* handleUpdateFrameSchema({ nextSchemaSource }) {
-  // todo - Call service/api using LOAD_FRAME_SCHEMA
+  const { serviceUrl } = yield select()
+  yield call(CrystalService.loadFrameSchema, {
+    serviceUrl,
+    schemaSource: nextSchemaSource
+  })
 }
 
 function* handleUpdateServiceUrl({ nextServiceUrl }) {
