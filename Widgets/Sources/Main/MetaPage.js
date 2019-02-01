@@ -10,7 +10,8 @@ function PageDisplay({
   serviceUrl,
   updateServiceUrl,
   frameDimensions,
-  updateFrameDimensions
+  updateFrameDimensions,
+  updateFrameSchema
 }) {
   return (
     <div className={classes.pageContainer}>
@@ -20,6 +21,7 @@ function PageDisplay({
         updateServiceUrl={updateServiceUrl}
         frameDimensions={frameDimensions}
         updateFrameDimensions={updateFrameDimensions}
+        updateFrameSchema={updateFrameSchema}
       />
     </div>
   )
@@ -37,6 +39,7 @@ function applyPageBehavior(Component) {
           leaveMetaPage={this.props.leaveMetaPage}
           updateServiceUrl={this.updateServiceUrl.bind(this)}
           updateFrameDimensions={this.updateFrameDimensions.bind(this)}
+          updateFrameSchema={this.updateFrameSchema.bind(this)}
         />
       )
     }
@@ -52,6 +55,13 @@ function applyPageBehavior(Component) {
       this.context.postUserMessage({
         type: 'UPDATE_FRAME_DIMENSIONS',
         payload: { nextFrameDimensions }
+      })
+    }
+
+    updateFrameSchema(nextSchemaSource) {
+      this.context.postUserMessage({
+        type: 'UPDATE_FRAME_SCHEMA',
+        payload: { nextSchemaSource }
       })
     }
   }

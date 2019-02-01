@@ -138,3 +138,25 @@ final class MainViewController: NSViewController, WKUIDelegate {
     fatalError("WTF?")
   }
 }
+
+@available(macOS 10.12, *)
+extension MainViewController {
+  func webView(
+    _ webView: WKWebView, 
+    runOpenPanelWith parameters: WKOpenPanelParameters, 
+    initiatedByFrame frame: WKFrameInfo,
+    completionHandler: @escaping ([URL]?) -> Void) 
+  {
+    let openPanel = NSOpenPanel()
+    openPanel.canChooseFiles = true
+    openPanel.begin { 
+      result in
+      guard result == NSApplication.ModalResponse.OK 
+      else {
+        completionHandler(nil)
+        return
+      }
+      completionHandler([openPanel.url!])
+    }
+  }
+}

@@ -1,45 +1,31 @@
 import React from 'react'
 import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles'
-import MetaPanel from './MetaPanel'
+import MetaSection from './MetaSection'
 
 function ListDisplay({
   classes,
-  serviceExpanded,
-  toggleServicePanel,
   serviceUrl,
   updateServiceUrl,
-  dimensionsExpanded,
-  toggleDimensionsPanel,
   frameDimensions,
   updateFrameDimensions,
-  schemaExpanded,
-  toggleSchemaPanel
+  updateFrameSchema
 }) {
-  console.log(frameDimensions)
   return (
     <div className={classes.listContainer}>
-      <MetaPanel
-        expanded={serviceExpanded}
-        onToggle={toggleServicePanel}
-        title="Service"
-      >
+      <MetaSection title="Service">
         <TextField
           value={serviceUrl}
           onChange={changeEvent => updateServiceUrl(changeEvent.target.value)}
-          label="URL"
           variant="outlined"
-          margin="dense"
+          margin="normal"
+          label="URL"
           placeholder="http://localhost:3000"
-          required
           fullWidth
         />
-      </MetaPanel>
-      <MetaPanel
-        expanded={dimensionsExpanded}
-        onToggle={toggleDimensionsPanel}
-        title="Dimensions"
-      >
+      </MetaSection>
+      <MetaSection title="Dimensions">
         <TextField
           value={frameDimensions.width}
           onChange={changeEvent =>
@@ -48,12 +34,10 @@ function ListDisplay({
               width: Number(changeEvent.target.value)
             })
           }
-          label="Width"
-          variant="outlined"
-          margin="dense"
           type="number"
-          placeholder="512"
-          required
+          variant="outlined"
+          margin="normal"
+          label="Width"
           fullWidth
         />
         <TextField
@@ -64,73 +48,42 @@ function ListDisplay({
               height: Number(changeEvent.target.value)
             })
           }
-          label="Height"
+          type="number"
           variant="outlined"
           margin="normal"
-          type="number"
-          placeholder="512"
-          required
+          label="Height"
           fullWidth
         />
-      </MetaPanel>
-      <MetaPanel
-        expanded={schemaExpanded}
-        onToggle={toggleSchemaPanel}
-        title="Schema"
-      />
+      </MetaSection>
+      <MetaSection title="Schema">
+        <input
+          className={classes.hiddenFileInput}
+          id="upload-source-button"
+          type="file"
+          onChange={changeEvent => {
+            const sourceFile = changeEvent.target.files[0]
+            const sourceReader = new FileReader()
+            sourceReader.readAsText(sourceFile, 'UTF-8')
+            sourceReader.onload = sourceLoadedEvent =>
+              updateFrameSchema(sourceLoadedEvent.target.result)
+          }}
+        />
+        <label htmlFor="upload-source-button">
+          <Button variant="outlined" size="large" fullWidth>
+            Load Source
+          </Button>
+        </label>
+      </MetaSection>
     </div>
   )
 }
 
-function applyListBehavior(Component) {
-  class Instance extends React.Component {
-    state = {
-      serviceExpanded: false,
-      dimensionsExpanded: false,
-      schemaExpanded: false
-    }
-
-    render() {
-      return (
-        <Component
-          serviceUrl={this.props.serviceUrl}
-          updateServiceUrl={this.props.updateServiceUrl}
-          frameDimensions={this.props.frameDimensions}
-          updateFrameDimensions={this.props.updateFrameDimensions}
-          serviceExpanded={this.state.serviceExpanded}
-          dimensionsExpanded={this.state.dimensionsExpanded}
-          toggleServicePanel={this.toggleServicePanel.bind(this)}
-          toggleDimensionsPanel={this.toggleDimensionsPanel.bind(this)}
-          toggleSchemaPanel={this.toggleSchemaPanel.bind(this)}
-        />
-      )
-    }
-
-    toggleServicePanel() {
-      this.setState({
-        serviceExpanded: !this.state.serviceExpanded
-      })
-    }
-
-    toggleDimensionsPanel() {
-      this.setState({
-        dimensionsExpanded: !this.state.dimensionsExpanded
-      })
-    }
-
-    toggleSchemaPanel() {
-      this.setState({
-        schemaExpanded: !this.state.schemaExpanded
-      })
-    }
-  }
-  return Instance
-}
-
-const ListDisplayWithStyles = withStyles({
+export default withStyles({
   listContainer: {
     flex: '1 1 auto',
     overflow: 'scroll'
+  },
+  hiddenFileInput: {
+    display: 'none'
   }
 })(ListDisplay)
-export default applyListBehavior(ListDisplayWithStyles)
