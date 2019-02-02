@@ -26,9 +26,18 @@ const UserInterface = {
       }, Buffers.expanding())
       resolve({ userInputChannel })
     }),
-  hydrate: coreState =>
+  hydrateMainWidget: coreState =>
     new Promise(resolve => {
       _hydrateMainWidget(coreState)
+      resolve()
+    }),
+  hydrateImageViewer: ({ serviceUrl, frameDimensions, frameLayers }) =>
+    new Promise(resolve => {
+      _UserInterface.hydrateImageViewer(
+        serviceUrl,
+        frameDimensions,
+        frameLayers
+      )
       resolve()
     })
 }
@@ -42,7 +51,7 @@ function _hydrateMainWidget(coreState) {
     }
   }
   const hydrateWidgetMessageString = JSON.stringify(hydrateWidgetMessage)
-  _UserInterface.hydrate(hydrateWidgetMessageString)
+  _UserInterface.hydrateMainWidget(hydrateWidgetMessageString)
 }
 
 export default UserInterface

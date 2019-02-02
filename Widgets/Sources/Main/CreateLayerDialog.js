@@ -7,7 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import { WidgetContext } from '../setupAndRenderWidget'
 
-const LAYER_JSON_TEMPLATE = `{
+const LAYER_STRING_TEMPLATE = `{
     type: "Foo",
     inputs: {
 
@@ -17,8 +17,8 @@ const LAYER_JSON_TEMPLATE = `{
 function DialogDisplay({
   open,
   onExited,
-  frameLayerJson,
-  updateFrameLayerJson,
+  frameLayerString,
+  updateFrameLayerString,
   cancelNewLayer,
   acceptNewLayer
 }) {
@@ -27,16 +27,16 @@ function DialogDisplay({
       <DialogTitle>New Layer</DialogTitle>
       <DialogContent>
         <TextField
-          value={frameLayerJson}
+          value={frameLayerString}
           onChange={changeEvent =>
-            updateFrameLayerJson(changeEvent.target.value)
+            updateFrameLayerString(changeEvent.target.value)
           }
           rows={12}
           type="text"
           spellCheck="false"
           margin="normal"
           variant="outlined"
-          label="JSON"
+          label="POJO"
           fullWidth
           multiline
         />
@@ -59,7 +59,7 @@ function applyDialogBehavior(Component) {
 
     state = {
       open: true,
-      frameLayerJson: LAYER_JSON_TEMPLATE
+      frameLayerString: LAYER_STRING_TEMPLATE
     }
 
     render() {
@@ -67,17 +67,17 @@ function applyDialogBehavior(Component) {
         <Component
           onExited={this.props.onExited}
           open={this.state.open}
-          frameLayerJson={this.state.frameLayerJson}
-          updateFrameLayerJson={this.updateFrameLayerJson.bind(this)}
+          frameLayerString={this.state.frameLayerString}
+          updateFrameLayerString={this.updateFrameLayerString.bind(this)}
           cancelNewLayer={this.cancelNewLayer.bind(this)}
           acceptNewLayer={this.acceptNewLayer.bind(this)}
         />
       )
     }
 
-    updateFrameLayerJson(nextFrameLayerJson) {
+    updateFrameLayerString(nextFrameLayerString) {
       this.setState({
-        frameLayerJson: nextFrameLayerJson
+        frameLayerString: nextFrameLayerString
       })
     }
 
@@ -92,7 +92,7 @@ function applyDialogBehavior(Component) {
         open: false
       })
       const newFrameLayer = new Function(
-        `return ${this.state.frameLayerJson}`
+        `return ${this.state.frameLayerString}`
       )()
       this.context.postUserMessage({
         type: 'PUSH_FRAME_LAYER',

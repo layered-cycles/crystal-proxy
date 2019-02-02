@@ -5,11 +5,13 @@ import Vapor
 
 final class UserInterface {
   var mainWindowController: MainWindowController!
+  var imageWindowController: ImageWindowController!
 
-  func setup(userInputMessageHandler: JSValue) {
+  func _launch(userInputMessageHandler: JSValue) {
     _startWebsocketServer(
       userInputMessageHandler: userInputMessageHandler) 
     mainWindowController = MainWindowController()
+    imageWindowController = ImageWindowController()
   }
 
   func _startWebsocketServer(userInputMessageHandler: JSValue) {
@@ -39,11 +41,26 @@ final class UserInterface {
     vapor.asyncRun()
   }
 
-  func hydrateWidget(widgetState: String) {
+  func _hydrateMainWidget(widgetState: String) {
     mainWindowController
       .viewController
       .webSocket
       .send(widgetState)
+  }
+
+  func _hydrateImageViewer(
+    serviceUrlString: String, 
+    frameDimensions: [String: Double], 
+    frameLayers: [AnyObject]) 
+  {
+    CrystalService.renderFrameImage(
+      serviceUrlString: serviceUrlString,
+      frameDimensions: frameDimensions, 
+      frameLayers: frameLayers) {
+        nextImageData in
+        self.imageWindowController.updateImage(
+          imageData: nextImageData)
+      }
   }
 }
 
@@ -55,16 +72,21 @@ extension UserInterface: StatefulCoreService {
   var api: Core.Service.Api {
     return [
       "launch": launch,
-      "hydrate": hydrate
+      "hydrateMainWidget": hydrateMainWidget,
+      "hydrateImageViewer": hydrateImageViewer
     ]
   }
 
   var launch: @convention(block) (JSValue) -> () {
-    return self.setup
+    return self._launch
   }
 
-  var hydrate: @convention(block) (String) -> () {
-    return self.hydrateWidget
+  var hydrateMainWidget: @convention(block) (String) -> () {
+    return self._hydrateMainWidget
+  }
+
+  var hydrateImageViewer: @convention(block) (String, [String: Double], [AnyObject]) -> () {
+    return self._hydrateImageViewer
   }
 }
 
@@ -158,5 +180,69 @@ extension MainViewController {
       }
       completionHandler([openPanel.url!])
     }
+  }
+}
+
+final class ImageWindowController: NSWindowController {
+  let viewController = ImageViewController()
+
+  init() {
+    let imageViewerWindow = NSWindow(
+      contentViewController: viewController)
+    let initialWidth = 512.0
+    let initialHeight = 512.0
+    let initialContentSize = NSSize(
+      width: initialWidth,
+      height: initialHeight)
+    imageViewerWindow
+      .setContentSize(initialContentSize)
+    imageViewerWindow.backgroundColor = NSColor(
+      red: 246.0 / 255,
+      green: 246.0 / 255,
+      blue: 246.0 / 255,
+      alpha: 1.0)
+    imageViewerWindow.titlebarAppearsTransparent = true
+    imageViewerWindow.title = "Image"
+    imageViewerWindow.styleMask = NSWindow.StyleMask(rawValue:
+      NSWindow.StyleMask.titled.rawValue |
+      NSWindow.StyleMask.closable.rawValue |
+      NSWindow.StyleMask.miniaturizable.rawValue)
+    super.init(
+      window: imageViewerWindow)
+    self.showWindow(self)
+  }
+
+  func updateImage(imageData: Data) {
+    let newImage = NSImage(
+      data: imageData)!
+    viewController.imageView.image = newImage
+    window!.setContentSize(newImage.size)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("WTF?")
+  }
+}
+
+final class ImageViewController: NSViewController {
+  var imageView: NSImageView!
+
+  override func loadView() {
+    if #available(macOS 10.12, *) {
+      let emptyImage = NSImage()
+      imageView = NSImageView(
+        image: emptyImage)
+      view = imageView
+    }    
+  }
+
+  init() {
+    super.init(
+      nibName: nil, 
+      bundle: nil)      
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("WTF?")
   }
 }

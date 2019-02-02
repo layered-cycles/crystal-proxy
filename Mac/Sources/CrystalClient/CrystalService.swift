@@ -25,6 +25,32 @@ enum CrystalService {
         withArguments: [])  
     }
   }
+
+  static func renderFrameImage(
+    serviceUrlString: String, 
+    frameDimensions: [String: Double], 
+    frameLayers: [AnyObject],
+    completionHandler: @escaping (Data) -> ()) 
+  {
+    Alamofire
+      .request(
+        "\(serviceUrlString)/api", 
+        method: .post, 
+        parameters: [
+          "type": "RENDER_FRAME_IMAGE",
+          "payload": [
+            "width": frameDimensions["width"]!,
+            "height": frameDimensions["height"]!,
+            "layers": frameLayers
+          ]
+        ], 
+        encoding: JSONEncoding.default)
+      .response 
+    { 
+      response in
+      completionHandler(response.data!)
+    }
+  }
 }
 
 extension CrystalService: FixedCoreService {

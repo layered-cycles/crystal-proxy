@@ -44,7 +44,8 @@ function handleServiceUrlUpdated(state, { serviceUrl }) {
 
 function* initializer() {
   yield spawn(userInputProcessor)
-  yield spawn(userInterfaceHydrator)
+  yield spawn(mainWidgetHydrator)
+  yield spawn(imageViewerHydrator)
 }
 
 function* userInputProcessor() {
@@ -109,7 +110,7 @@ function* handleUpdateServiceUrl({ nextServiceUrl }) {
   })
 }
 
-function* userInterfaceHydrator() {
+function* mainWidgetHydrator() {
   while (true) {
     yield take([
       'FRAME_DIMENSIONS_UPDATED',
@@ -117,6 +118,18 @@ function* userInterfaceHydrator() {
       'SERVICE_URL_UPDATED'
     ])
     const coreState = yield select()
-    yield call(UserInterface.hydrate, coreState)
+    yield call(UserInterface.hydrateMainWidget, coreState)
+  }
+}
+
+function* imageViewerHydrator() {
+  while (true) {
+    yield take(['FRAME_LAYER_PUSHED'])
+    const { serviceUrl, frameDimensions, frameLayers } = yield select()
+    yield call(UserInterface.hydrateImageViewer, {
+      serviceUrl,
+      frameDimensions,
+      frameLayers
+    })
   }
 }
