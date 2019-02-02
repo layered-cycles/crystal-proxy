@@ -42,10 +42,10 @@ function DialogDisplay({
         />
       </DialogContent>
       <DialogActions>
-        <Button color="primary" onClick={cancelNewLayer}>
+        <Button onClick={cancelNewLayer} color="primary">
           Cancel
         </Button>
-        <Button color="primary" onClick={acceptNewLayer}>
+        <Button onClick={acceptNewLayer} color="primary">
           Create
         </Button>
       </DialogActions>

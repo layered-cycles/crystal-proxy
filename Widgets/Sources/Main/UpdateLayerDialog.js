@@ -1,16 +1,22 @@
 import React from 'react'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Typography from '@material-ui/core/Typography'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/Delete'
 import DialogContent from '@material-ui/core/DialogContent'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
+import { withStyles } from '@material-ui/core/styles'
 import { WidgetContext } from '../setupAndRenderWidget'
 
 function DialogDisplay({
   open,
   onExited,
+  classes,
   layerIndex,
+  deleteLayer,
   frameLayerString,
   updateFrameLayerString,
   cancelUpdateLayer,
@@ -18,7 +24,12 @@ function DialogDisplay({
 }) {
   return (
     <Dialog open={open} onExited={onExited}>
-      <DialogTitle>Layer - {layerIndex + 1}</DialogTitle>
+      <DialogTitle className={classes.titleContainer} disableTypography>
+        <Typography variant="h6">Layer: {layerIndex + 1}</Typography>
+        <IconButton className={classes.deleteButton} onClick={deleteLayer}>
+          <DeleteIcon className={classes.deleteIcon} />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
         <TextField
           value={frameLayerString}
@@ -36,10 +47,10 @@ function DialogDisplay({
         />
       </DialogContent>
       <DialogActions>
-        <Button color="primary" onClick={cancelUpdateLayer}>
+        <Button onClick={cancelUpdateLayer} color="primary">
           Cancel
         </Button>
-        <Button color="primary" onClick={acceptUpdateLayer}>
+        <Button onClick={acceptUpdateLayer} color="primary">
           Update
         </Button>
       </DialogActions>
@@ -69,6 +80,7 @@ function applyDialogBehavior(Component) {
           updateFrameLayerString={this.updateFrameLayerString.bind(this)}
           cancelUpdateLayer={this.cancelUpdateLayer.bind(this)}
           acceptUpdateLayer={this.acceptUpdateLayer.bind(this)}
+          deleteLayer={this.deleteLayer.bind(this)}
         />
       )
     }
@@ -101,8 +113,34 @@ function applyDialogBehavior(Component) {
         }
       })
     }
+
+    deleteLayer() {
+      this.setState({
+        open: false
+      })
+      this.context.postUserMessage({
+        type: 'DELETE_FRAME_LAYER',
+        payload: {
+          layerIndex: this.props.layerIndex
+        }
+      })
+    }
   }
   return Instance
 }
 
-export default applyDialogBehavior(DialogDisplay)
+const DialogDisplayWithStyles = withStyles(theme => ({
+  titleContainer: {
+    margin: 0,
+    paddingTop: theme.spacing.unit * 2
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: theme.spacing.unit,
+    top: theme.spacing.unit
+  },
+  deleteIcon: {
+    color: theme.palette.primary.dark
+  }
+}))(DialogDisplay)
+export default applyDialogBehavior(DialogDisplayWithStyles)
