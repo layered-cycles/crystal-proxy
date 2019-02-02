@@ -74,8 +74,8 @@ final class MainWindowController: NSWindowController {
   init() {
     let mainWidgetWindow = NSWindow(
       contentViewController: viewController)
-    let initialWidth = 512.0 * 0.66
-    let initialHeight = 550.0
+    let initialWidth = 338.0
+    let initialHeight = 644.0
     let initialContentSize = NSSize(
       width: initialWidth,
       height: initialHeight)

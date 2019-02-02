@@ -1,4 +1,3 @@
-import Foundation
 import JavaScriptCore
 import Alamofire
 
@@ -8,16 +7,17 @@ enum CrystalService {
     schemaSourceString: String, 
     completionHandler: JSValue) 
   {
-    Alamofire.request(
-      "\(serviceUrlString)/api", 
-      method: .post, 
-      parameters: [
-        "type": "LOAD_FRAME_SCHEMA",
-        "payload": [
-          "sourceCode": schemaSourceString
-        ]
-      ], 
-      encoding: JSONEncoding.default)
+    Alamofire
+      .request(
+        "\(serviceUrlString)/api", 
+        method: .post, 
+        parameters: [
+          "type": "LOAD_FRAME_SCHEMA",
+          "payload": [
+            "sourceCode": schemaSourceString
+          ]
+        ], 
+        encoding: JSONEncoding.default)
       .response 
     { 
       response in

@@ -9,6 +9,8 @@ function reducer(state = createInitialState(), action) {
   switch (action.type) {
     case 'FRAME_DIMENSIONS_UPDATED':
       return handleFrameDimensionsUpdated(state, action.payload)
+    case 'FRAME_LAYER_PUSHED':
+      return handleFrameLayerPushed(state, action.payload)
     case 'SERVICE_URL_UPDATED':
       return handleServiceUrlUpdated(state, action.payload)
     default:
@@ -18,16 +20,22 @@ function reducer(state = createInitialState(), action) {
 
 function createInitialState() {
   return {
-    serviceUrl: 'http://localhost:3000',
     frameDimensions: {
       width: 512,
       height: 512
-    }
+    },
+    frameLayers: [],
+    serviceUrl: 'http://localhost:3000'
   }
 }
 
 function handleFrameDimensionsUpdated(state, { frameDimensions }) {
   return { ...state, frameDimensions }
+}
+
+function handleFrameLayerPushed(state, { newFrameLayer }) {
+  const frameLayers = state.frameLayers.concat([newFrameLayer])
+  return { ...state, frameLayers }
 }
 
 function handleServiceUrlUpdated(state, { serviceUrl }) {
@@ -48,6 +56,9 @@ function* userInputProcessor() {
   while (true) {
     const userInputMessage = yield take(userInputChannel)
     switch (userInputMessage.type) {
+      case 'PUSH_FRAME_LAYER':
+        yield call(handlePushFrameLayer, userInputMessage.payload)
+        continue
       case 'UPDATE_FRAME_DIMENSIONS':
         yield call(handleUpdateFrameDimensions, userInputMessage.payload)
         continue
@@ -63,6 +74,13 @@ function* userInputProcessor() {
         )
     }
   }
+}
+
+function* handlePushFrameLayer({ newFrameLayer }) {
+  yield put({
+    type: 'FRAME_LAYER_PUSHED',
+    payload: { newFrameLayer }
+  })
 }
 
 function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
@@ -93,7 +111,11 @@ function* handleUpdateServiceUrl({ nextServiceUrl }) {
 
 function* userInterfaceHydrator() {
   while (true) {
-    yield take(['SERVICE_URL_UPDATED', 'FRAME_DIMENSIONS_UPDATED'])
+    yield take([
+      'FRAME_DIMENSIONS_UPDATED',
+      'FRAME_LAYER_PUSHED',
+      'SERVICE_URL_UPDATED'
+    ])
     const coreState = yield select()
     yield call(UserInterface.hydrate, coreState)
   }

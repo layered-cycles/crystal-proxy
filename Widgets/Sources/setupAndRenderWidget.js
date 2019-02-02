@@ -20,7 +20,7 @@ function setupAndRenderWidget(Widget) {
   class RootBehavior extends React.Component {
     state = {
       postUserMessage: null,
-      widgetState: null
+      widgetState: Widget.getDefaultState()
     }
 
     componentDidMount() {

@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography'
 import AddIcon from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core/styles'
 
-function HeaderDisplay({ classes, enterMetaPage }) {
+function HeaderDisplay({ classes, enterMetaPage, createLayer }) {
   return (
     <AppBar position="static">
       <Toolbar>
@@ -25,7 +25,7 @@ function HeaderDisplay({ classes, enterMetaPage }) {
         >
           Crystal
         </Typography>
-        <IconButton color="inherit" onClick={() => null}>
+        <IconButton color="inherit" onClick={createLayer}>
           <AddIcon fontSize="large" />
         </IconButton>
       </Toolbar>
