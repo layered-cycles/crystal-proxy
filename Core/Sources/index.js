@@ -11,6 +11,8 @@ function reducer(state = createInitialState(), action) {
       return handleFrameDimensionsUpdated(state, action.payload)
     case 'FRAME_LAYER_PUSHED':
       return handleFrameLayerPushed(state, action.payload)
+    case 'FRAME_LAYER_UPDATED':
+      return handleFrameLayerUpdated(state, action.payload)
     case 'SERVICE_URL_UPDATED':
       return handleServiceUrlUpdated(state, action.payload)
     default:
@@ -38,6 +40,15 @@ function handleFrameLayerPushed(state, { newFrameLayer }) {
   return { ...state, frameLayers }
 }
 
+function handleFrameLayerUpdated(
+  state,
+  { updatedLayerIndex, updatedFrameLayer }
+) {
+  const frameLayers = state.frameLayers.slice()
+  frameLayers[updatedLayerIndex] = updatedFrameLayer
+  return { ...state, frameLayers }
+}
+
 function handleServiceUrlUpdated(state, { serviceUrl }) {
   return { ...state, serviceUrl }
 }
@@ -62,6 +73,9 @@ function* userInputProcessor() {
         continue
       case 'UPDATE_FRAME_DIMENSIONS':
         yield call(handleUpdateFrameDimensions, userInputMessage.payload)
+        continue
+      case 'UPDATE_FRAME_LAYER':
+        yield call(handleUpdateFrameLayer, userInputMessage.payload)
         continue
       case 'UPDATE_FRAME_SCHEMA':
         yield call(handleUpdateFrameSchema, userInputMessage.payload)
@@ -93,6 +107,16 @@ function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
   })
 }
 
+function* handleUpdateFrameLayer({ updatedLayerIndex, updatedFrameLayer }) {
+  yield put({
+    type: 'FRAME_LAYER_UPDATED',
+    payload: {
+      updatedLayerIndex,
+      updatedFrameLayer
+    }
+  })
+}
+
 function* handleUpdateFrameSchema({ nextSchemaSource }) {
   const { serviceUrl } = yield select()
   yield call(CrystalService.loadFrameSchema, {
@@ -115,6 +139,7 @@ function* mainWidgetHydrator() {
     yield take([
       'FRAME_DIMENSIONS_UPDATED',
       'FRAME_LAYER_PUSHED',
+      'FRAME_LAYER_UPDATED',
       'SERVICE_URL_UPDATED'
     ])
     const coreState = yield select()
@@ -124,7 +149,7 @@ function* mainWidgetHydrator() {
 
 function* imageViewerHydrator() {
   while (true) {
-    yield take(['FRAME_LAYER_PUSHED'])
+    yield take(['FRAME_LAYER_PUSHED', 'FRAME_LAYER_UPDATED'])
     const { serviceUrl, frameDimensions, frameLayers } = yield select()
     yield call(UserInterface.hydrateImageViewer, {
       serviceUrl,

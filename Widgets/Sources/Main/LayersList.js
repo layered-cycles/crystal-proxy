@@ -19,15 +19,20 @@ function ListDisplay({ classes, layerItems }) {
   )
 }
 
-function ItemDisplay({ classes, layerIndex, layerType }) {
+function ItemDisplay({ classes, layerIndex, frameLayer, updateLayer }) {
   return (
     <ListItem key={layerIndex}>
       <ListItemAvatar>
         <Avatar className={classes.layerIndex}>{layerIndex + 1}</Avatar>
       </ListItemAvatar>
-      <ListItemText primary={layerType} />
+      <ListItemText primary={frameLayer.type} />
       <ListItemSecondaryAction>
-        <IconButton>
+        <IconButton
+          onClick={updateLayer.bind(null, {
+            nextActiveFrameLayer: frameLayer,
+            nextActiveLayerIndex: layerIndex
+          })}
+        >
           <LaunchIcon className={classes.launchIcon} />
         </IconButton>
       </ListItemSecondaryAction>
@@ -48,7 +53,8 @@ function applyListBehavior(Component) {
         ) : null
         return [
           <ItemDisplayWithStyles
-            layerType={layer.type}
+            updateLayer={this.props.updateLayer}
+            frameLayer={layer}
             layerIndex={layerIndex}
           />,
           dividerElement
