@@ -6,7 +6,7 @@ import Avatar from '@material-ui/core/Avatar'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import IconButton from '@material-ui/core/IconButton'
-import LaunchIcon from '@material-ui/icons/Launch'
+import LaunchIcon from '@material-ui/icons/LaunchRounded'
 import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 import { WidgetContext } from '../setupAndRenderWidget'
@@ -19,19 +19,23 @@ function ListDisplay({ classes, layerItems }) {
   )
 }
 
-function ItemDisplay({ classes, layerIndex, frameLayer, updateLayer }) {
+function ItemDisplay({ classes, layerIndex, frameLayer, focusLayer }) {
   return (
     <ListItem key={layerIndex}>
       <ListItemAvatar>
-        <Avatar className={classes.layerIndex}>{layerIndex + 1}</Avatar>
+        <Avatar className={classes.layerIndex}>{layerIndex}</Avatar>
       </ListItemAvatar>
       <ListItemText primary={frameLayer.type} />
       <ListItemSecondaryAction>
         <IconButton
-          onClick={updateLayer.bind(null, {
-            nextActiveFrameLayer: frameLayer,
-            nextActiveLayerIndex: layerIndex
-          })}
+          onClick={() =>
+            focusLayer({
+              nextFocusedLayer: {
+                index: layerIndex,
+                value: frameLayer
+              }
+            })
+          }
         >
           <LaunchIcon className={classes.launchIcon} />
         </IconButton>
@@ -53,7 +57,7 @@ function applyListBehavior(Component) {
         ) : null
         return [
           <ItemDisplayWithStyles
-            updateLayer={this.props.updateLayer}
+            focusLayer={this.props.focusLayer}
             frameLayer={layer}
             layerIndex={layerIndex}
           />,

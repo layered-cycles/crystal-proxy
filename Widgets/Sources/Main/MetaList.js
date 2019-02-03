@@ -14,18 +14,7 @@ function ListDisplay({
 }) {
   return (
     <div className={classes.listContainer}>
-      <MetaSection title="Service">
-        <TextField
-          value={serviceUrl}
-          onChange={changeEvent => updateServiceUrl(changeEvent.target.value)}
-          variant="outlined"
-          margin="normal"
-          label="URL"
-          placeholder="http://localhost:3000"
-          fullWidth
-        />
-      </MetaSection>
-      <MetaSection title="Dimensions">
+      <MetaSection title="Frame">
         <TextField
           value={frameDimensions.width}
           onChange={changeEvent =>
@@ -55,10 +44,19 @@ function ListDisplay({
           fullWidth
         />
       </MetaSection>
-      <MetaSection title="Schema">
+      <MetaSection title="Service">
+        <TextField
+          value={serviceUrl}
+          onChange={changeEvent => updateServiceUrl(changeEvent.target.value)}
+          variant="outlined"
+          margin="normal"
+          label="URL"
+          placeholder="http://localhost:3000"
+          fullWidth
+        />
         <input
           className={classes.hiddenFileInput}
-          id="upload-source-button"
+          id="load-schema-button"
           type="file"
           onChange={changeEvent => {
             const sourceFile = changeEvent.target.files[0]
@@ -68,9 +66,9 @@ function ListDisplay({
               updateFrameSchema(sourceLoadedEvent.target.result)
           }}
         />
-        <label htmlFor="upload-source-button">
+        <label htmlFor="load-schema-button">
           <Button variant="outlined" size="large" fullWidth>
-            Load Source
+            Load Schema
           </Button>
         </label>
       </MetaSection>

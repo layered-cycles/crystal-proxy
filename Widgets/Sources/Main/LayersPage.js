@@ -1,45 +1,32 @@
 import React from 'react'
+import { withStyles } from '@material-ui/core/styles'
+import LayerDialog from './LayerDialog'
 import LayersHeader from './LayersHeader'
 import LayersList from './LayersList'
-import CreateLayerDialog from './CreateLayerDialog'
-import { withStyles } from '@material-ui/core/styles'
-import UpdateLayerDialog from './UpdateLayerDialog'
-
-const DisplayMode = {
-  CREATE: 'CREATE__DISPLAY_MODE',
-  UPDATE: 'UPDATE__DISPLAY_MODE',
-  LIST: 'LIST__DISPLAY_MODE'
-}
+import { WidgetContext } from '../setupAndRenderWidget'
 
 function PageDisplay({
-  displayMode,
-  resetDisplayMode,
-  activeLayerIndex,
-  activeFrameLayer,
+  _focusedLayer,
+  _unfocusLayer,
   classes,
   enterMetaPage,
-  createLayer,
-  updateLayer
+  _focusLayer,
+  layersLength
 }) {
   let dialogContent = null
-  switch (displayMode) {
-    case DisplayMode.CREATE:
-      dialogContent = <CreateLayerDialog onExited={resetDisplayMode} />
-      break
-    case DisplayMode.UPDATE:
-      dialogContent = (
-        <UpdateLayerDialog
-          onExited={resetDisplayMode}
-          layerIndex={activeLayerIndex}
-          frameLayer={activeFrameLayer}
-        />
-      )
-      break
+  if (_focusedLayer) {
+    dialogContent = (
+      <LayerDialog focusedLayer={_focusedLayer} unfocusLayer={_unfocusLayer} />
+    )
   }
   return (
     <div className={classes.pageContainer}>
-      <LayersHeader enterMetaPage={enterMetaPage} createLayer={createLayer} />
-      <LayersList updateLayer={updateLayer} />
+      <LayersHeader
+        enterMetaPage={enterMetaPage}
+        focusLayer={_focusLayer}
+        layersLength={layersLength}
+      />
+      <LayersList focusLayer={_focusLayer} />
       {dialogContent}
     </div>
   )
@@ -47,44 +34,36 @@ function PageDisplay({
 
 function applyPageBehavior(Component) {
   class Instance extends React.Component {
+    static contextType = WidgetContext
+
     state = {
-      displayMode: DisplayMode.LIST,
-      activeLayerIndex: null,
-      activeFrameLayer: null
+      focusedLayer: null
     }
 
     render() {
       return (
         <Component
+          layersLength={this.context.widgetState.frameLayers.length}
           enterMetaPage={this.props.enterMetaPage}
-          displayMode={this.state.displayMode}
-          activeLayerIndex={this.state.activeLayerIndex}
-          activeFrameLayer={this.state.activeFrameLayer}
-          resetDisplayMode={this.resetDisplayMode.bind(this)}
-          createLayer={this.createLayer.bind(this)}
-          updateLayer={this.updateLayer.bind(this)}
+          _focusedLayer={this.state.focusedLayer}
+          _focusLayer={this.focusLayer.bind(this)}
+          _unfocusLayer={this.unfocusLayer.bind(this)}
         />
       )
     }
 
-    resetDisplayMode() {
+    focusLayer({ nextFocusedLayer }) {
       this.setState({
-        displayMode: DisplayMode.LIST,
-        activeFrameLayer: null
+        focusedLayer: {
+          isNew: false,
+          ...nextFocusedLayer
+        }
       })
     }
 
-    createLayer() {
+    unfocusLayer() {
       this.setState({
-        displayMode: DisplayMode.CREATE
-      })
-    }
-
-    updateLayer({ nextActiveFrameLayer, nextActiveLayerIndex }) {
-      this.setState({
-        displayMode: DisplayMode.UPDATE,
-        activeFrameLayer: nextActiveFrameLayer,
-        activeLayerIndex: nextActiveLayerIndex
+        focusedLayer: null
       })
     }
   }

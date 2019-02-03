@@ -2,30 +2,37 @@ import React from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
-import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory'
-import Typography from '@material-ui/core/Typography'
-import AddIcon from '@material-ui/icons/Add'
+import ChangeHistoryIcon from '@material-ui/icons/ChangeHistoryRounded'
+import AddIcon from '@material-ui/icons/AddRounded'
 import { withStyles } from '@material-ui/core/styles'
 
-function HeaderDisplay({ classes, enterMetaPage, createLayer }) {
+function HeaderDisplay({ classes, enterMetaPage, focusLayer, layersLength }) {
   return (
     <AppBar position="static">
       <Toolbar>
         <IconButton
-          color="inherit"
           className={classes.metaButton}
           onClick={enterMetaPage}
+          color="inherit"
         >
           <ChangeHistoryIcon fontSize="large" />
         </IconButton>
-        <Typography
-          variant="h6"
+        <div className={classes.buttonSpacer} />
+        <IconButton
+          onClick={() =>
+            focusLayer({
+              nextFocusedLayer: {
+                index: layersLength,
+                isNew: true,
+                value: {
+                  type: 'Foo',
+                  inputs: {}
+                }
+              }
+            })
+          }
           color="inherit"
-          className={classes.titleContainer}
         >
-          Crystal
-        </Typography>
-        <IconButton color="inherit" onClick={createLayer}>
           <AddIcon fontSize="large" />
         </IconButton>
       </Toolbar>
@@ -34,7 +41,7 @@ function HeaderDisplay({ classes, enterMetaPage, createLayer }) {
 }
 
 export default withStyles({
-  titleContainer: {
+  buttonSpacer: {
     flexGrow: 1
   },
   metaButton: {
