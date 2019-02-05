@@ -16,13 +16,13 @@ function ListDisplay({
     <div className={classes.listContainer}>
       <MetaSection title="Frame">
         <TextField
-          value={frameDimensions.width}
           onChange={changeEvent =>
             updateFrameDimensions({
               ...frameDimensions,
               width: Number(changeEvent.target.value)
             })
           }
+          value={frameDimensions.width}
           type="number"
           variant="outlined"
           margin="normal"

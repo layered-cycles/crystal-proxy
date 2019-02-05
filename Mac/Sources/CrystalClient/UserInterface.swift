@@ -10,8 +10,8 @@ final class UserInterface {
   func _launch(userInputMessageHandler: JSValue) {
     _startWebsocketServer(
       userInputMessageHandler: userInputMessageHandler) 
-    mainWindowController = MainWindowController()
     imageWindowController = ImageWindowController()
+    mainWindowController = MainWindowController()    
   }
 
   func _startWebsocketServer(userInputMessageHandler: JSValue) {
@@ -103,6 +103,10 @@ final class MainWindowController: NSWindowController {
       height: initialHeight)
     mainWidgetWindow
       .setContentSize(initialContentSize)
+    mainWidgetWindow.setFrameTopLeftPoint(
+      NSPoint(
+        x: 8, 
+        y: NSScreen.main!.frame.height - 32))
     mainWidgetWindow.backgroundColor = NSColor(
       red: 246.0 / 255,
       green: 246.0 / 255,
@@ -116,7 +120,7 @@ final class MainWindowController: NSWindowController {
       NSWindow.StyleMask.miniaturizable.rawValue)
     super.init(
       window: mainWidgetWindow)
-    self.showWindow(self)
+    self.showWindow(self)    
   }
 
   required init?(coder: NSCoder) {
@@ -193,9 +197,13 @@ final class ImageWindowController: NSWindowController {
     let initialHeight = 512.0
     let initialContentSize = NSSize(
       width: initialWidth,
-      height: initialHeight)
+      height: initialHeight)      
     imageViewerWindow
       .setContentSize(initialContentSize)
+    imageViewerWindow.setFrameTopLeftPoint(
+      NSPoint(
+        x: 360, 
+        y: NSScreen.main!.frame.height - 32))
     imageViewerWindow.backgroundColor = NSColor(
       red: 246.0 / 255,
       green: 246.0 / 255,

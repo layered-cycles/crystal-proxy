@@ -1,12 +1,12 @@
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import BlueGrey from '@material-ui/core/colors/bluegrey'
+import Grey from '@material-ui/core/colors/grey'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
 const crystalTheme = createMuiTheme({
   palette: {
     primary: {
-      main: BlueGrey[500]
+      main: Grey[600]
     }
   },
   typography: {
@@ -58,10 +58,12 @@ function setupAndRenderWidget(Widget) {
         />,
         <WidgetContext.Provider
           key="widget-context-provider"
-          value={this.state}
+          value={{
+            postUserMessage: this.state.postUserMessage
+          }}
         >
           <MuiThemeProvider theme={crystalTheme}>
-            <Widget />
+            <Widget {...this.state.widgetState} />
           </MuiThemeProvider>
         </WidgetContext.Provider>
       ]

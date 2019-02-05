@@ -1,6 +1,8 @@
  import Cocoa
  
  class AppDelegate: NSObject, NSApplicationDelegate {
+  let userInterface = UserInterface()
+
   func applicationDidFinishLaunching(
     _ notification: Notification) 
   {
@@ -11,9 +13,20 @@
       script: clientCoreBundle,
       with: [
         Console.coreService,
-        UserInterface().coreService,
+        userInterface.coreService,
         CrystalService.coreService
       ])
+  }
+
+  func applicationDidBecomeActive(_ notification: Notification) {
+    userInterface
+      .mainWindowController
+      .window!
+      .orderFrontRegardless()
+    userInterface
+    .imageWindowController
+    .window!
+    .orderFrontRegardless()
   }
 }
 

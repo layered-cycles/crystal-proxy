@@ -6,10 +6,11 @@ import Avatar from '@material-ui/core/Avatar'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import IconButton from '@material-ui/core/IconButton'
-import LaunchIcon from '@material-ui/icons/LaunchRounded'
+import LaunchIcon from '@material-ui/icons/VisibilityRounded'
 import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 import { WidgetContext } from '../setupAndRenderWidget'
+import { Typography } from '@material-ui/core'
 
 function ListDisplay({ classes, layerItems }) {
   return (
@@ -25,7 +26,10 @@ function ItemDisplay({ classes, layerIndex, frameLayer, focusLayer }) {
       <ListItemAvatar>
         <Avatar className={classes.layerIndex}>{layerIndex}</Avatar>
       </ListItemAvatar>
-      <ListItemText primary={frameLayer.type} />
+      {/* <ListItemText primary={frameLayer.type} /> */}
+      <ListItemText disableTypography>
+        <Typography className={classes.typeText}>{frameLayer.type}</Typography>
+      </ListItemText>
       <ListItemSecondaryAction>
         <IconButton
           onClick={() =>
@@ -37,7 +41,7 @@ function ItemDisplay({ classes, layerIndex, frameLayer, focusLayer }) {
             })
           }
         >
-          <LaunchIcon className={classes.launchIcon} />
+          <LaunchIcon className={classes.focusIcon} />
         </IconButton>
       </ListItemSecondaryAction>
     </ListItem>
@@ -49,7 +53,7 @@ function applyListBehavior(Component) {
     static contextType = WidgetContext
 
     render() {
-      const frameLayers = this.context.widgetState.frameLayers
+      const frameLayers = this.props.frameLayers
       const layerItems = frameLayers.map((layer, layerIndex) => {
         const layerIsNotLast = layerIndex !== frameLayers.length - 1
         const dividerElement = layerIsNotLast ? (
@@ -77,12 +81,17 @@ const ListDisplayWithStyles = withStyles({
   }
 })(ListDisplay)
 const ItemDisplayWithStyles = withStyles(theme => ({
-  layerIndex: {
-    color: theme.palette.primary.dark,
-    backgroundColor: 'transparent'
+  focusIcon: {
+    color: theme.palette.primary.main
   },
-  launchIcon: {
-    color: theme.palette.primary.dark
+  typeText: {
+    fontWeight: 300,
+    fontSize: '16px'
+  },
+  layerIndex: {
+    color: theme.palette.text.primary,
+    backgroundColor: 'transparent',
+    fontWeight: 500
   }
 }))(ItemDisplay)
 export default applyListBehavior(ListDisplayWithStyles)

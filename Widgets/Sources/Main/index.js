@@ -11,12 +11,27 @@ const DisplayMode = {
 const MainWidget = applyWidgetBehavior(WidgetDisplay)
 setupAndRenderWidget(MainWidget)
 
-function WidgetDisplay({ displayMode, enterMetaPage, leaveMetaPage }) {
+function WidgetDisplay({
+  displayMode,
+  enterMetaPage,
+  frameLayers,
+  frameDimensions,
+  leaveMetaPage,
+  serviceUrl
+}) {
   switch (displayMode) {
     case DisplayMode.LAYERS:
-      return <LayersPage enterMetaPage={enterMetaPage} />
+      return (
+        <LayersPage enterMetaPage={enterMetaPage} frameLayers={frameLayers} />
+      )
     case DisplayMode.META:
-      return <MetaPage leaveMetaPage={leaveMetaPage} />
+      return (
+        <MetaPage
+          frameDimensions={frameDimensions}
+          leaveMetaPage={leaveMetaPage}
+          serviceUrl={serviceUrl}
+        />
+      )
   }
 }
 
@@ -29,6 +44,9 @@ function applyWidgetBehavior(Component) {
     render() {
       return (
         <Component
+          frameDimensions={this.props.frameDimensions}
+          frameLayers={this.props.frameLayers}
+          serviceUrl={this.props.serviceUrl}
           displayMode={this.state.displayMode}
           enterMetaPage={this.enterMetaPage.bind(this)}
           leaveMetaPage={this.leaveMetaPage.bind(this)}

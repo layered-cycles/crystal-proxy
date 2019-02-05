@@ -2,7 +2,7 @@ import React from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
-import BackIcon from '@material-ui/icons/ArrowBackRounded'
+import DetailsIcon from '@material-ui/icons/DetailsRounded'
 import { withStyles } from '@material-ui/core/styles'
 
 function HeaderDisplay({ classes, leaveMetaPage }) {
@@ -14,7 +14,7 @@ function HeaderDisplay({ classes, leaveMetaPage }) {
           className={classes.backButton}
           onClick={leaveMetaPage}
         >
-          <BackIcon fontSize="large" />
+          <DetailsIcon fontSize="large" />
         </IconButton>
       </Toolbar>
     </AppBar>
@@ -27,6 +27,7 @@ export default withStyles({
   },
   backButton: {
     marginLeft: -10,
-    marginRight: 6
+    paddingTop: '14px',
+    paddingBottom: '10px'
   }
 })(HeaderDisplay)

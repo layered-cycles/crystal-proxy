@@ -23,7 +23,7 @@ function SectionDisplay({ classes, title, children }) {
   )
 }
 
-export default withStyles({
+export default withStyles(theme => ({
   expansionPanel: {
     backgroundColor: 'transparent',
     marginTop: 0,
@@ -33,4 +33,4 @@ export default withStyles({
     display: 'flex',
     flexDirection: 'column'
   }
-})(SectionDisplay)
+}))(SectionDisplay)

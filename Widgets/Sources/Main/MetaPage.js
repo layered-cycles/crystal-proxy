@@ -34,8 +34,8 @@ function applyPageBehavior(Component) {
     render() {
       return (
         <Component
-          serviceUrl={this.context.widgetState.serviceUrl}
-          frameDimensions={this.context.widgetState.frameDimensions}
+          serviceUrl={this.props.serviceUrl}
+          frameDimensions={this.props.frameDimensions}
           leaveMetaPage={this.props.leaveMetaPage}
           updateServiceUrl={this.updateServiceUrl.bind(this)}
           updateFrameDimensions={this.updateFrameDimensions.bind(this)}

@@ -27,7 +27,7 @@ function DialogDisplay({
   if (layerIsNotNew) {
     maybeDeleteButton = (
       <IconButton onClick={_deleteLayer}>
-        <DeleteIcon />
+        <DeleteIcon className={classes.actionIcon} />
       </IconButton>
     )
   }
@@ -43,7 +43,7 @@ function DialogDisplay({
           }
           rows={13}
           value={_jsonValueString}
-          helperText="json description..."
+          helperText="json"
           label="Layer"
           margin="dense"
           spellCheck="false"
@@ -57,10 +57,10 @@ function DialogDisplay({
         {maybeDeleteButton}
         <div className={classes.buttonSpacer} />
         <IconButton onClick={_backoutLayerChanges}>
-          <ArrowBackIoIcon />
+          <ArrowBackIoIcon className={classes.actionIcon} />
         </IconButton>
         <IconButton onClick={_forwardLayerChanges}>
-          <ArrowForwardIoIcon />
+          <ArrowForwardIoIcon className={classes.actionIcon} />
         </IconButton>
       </DialogActions>
     </Dialog>
@@ -139,6 +139,9 @@ function applyDialogBehavior(DisplayComponent) {
 const DialogDisplayWithStyles = withStyles(theme => ({
   buttonSpacer: {
     flex: '1 0 auto'
+  },
+  actionIcon: {
+    color: theme.palette.primary.main
   }
 }))(DialogDisplay)
 export default applyDialogBehavior(DialogDisplayWithStyles)

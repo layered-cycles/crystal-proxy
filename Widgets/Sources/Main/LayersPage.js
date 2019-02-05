@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles'
 import LayerDialog from './LayerDialog'
 import LayersHeader from './LayersHeader'
 import LayersList from './LayersList'
-import { WidgetContext } from '../setupAndRenderWidget'
 
 function PageDisplay({
   _focusedLayer,
@@ -11,7 +10,7 @@ function PageDisplay({
   classes,
   enterMetaPage,
   _focusLayer,
-  layersLength
+  frameLayers
 }) {
   let dialogContent = null
   if (_focusedLayer) {
@@ -24,9 +23,9 @@ function PageDisplay({
       <LayersHeader
         enterMetaPage={enterMetaPage}
         focusLayer={_focusLayer}
-        layersLength={layersLength}
+        layersLength={frameLayers.length}
       />
-      <LayersList focusLayer={_focusLayer} />
+      <LayersList focusLayer={_focusLayer} frameLayers={frameLayers} />
       {dialogContent}
     </div>
   )
@@ -34,8 +33,6 @@ function PageDisplay({
 
 function applyPageBehavior(Component) {
   class Instance extends React.Component {
-    static contextType = WidgetContext
-
     state = {
       focusedLayer: null
     }
@@ -43,8 +40,8 @@ function applyPageBehavior(Component) {
     render() {
       return (
         <Component
-          layersLength={this.context.widgetState.frameLayers.length}
           enterMetaPage={this.props.enterMetaPage}
+          frameLayers={this.props.frameLayers}
           _focusedLayer={this.state.focusedLayer}
           _focusLayer={this.focusLayer.bind(this)}
           _unfocusLayer={this.unfocusLayer.bind(this)}
