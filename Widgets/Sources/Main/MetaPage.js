@@ -11,6 +11,7 @@ function PageDisplay({
   updateServiceUrl,
   frameDimensions,
   updateFrameDimensions,
+  downloadFrameImage,
   updateFrameSchema
 }) {
   return (
@@ -21,6 +22,7 @@ function PageDisplay({
         updateServiceUrl={updateServiceUrl}
         frameDimensions={frameDimensions}
         updateFrameDimensions={updateFrameDimensions}
+        downloadFrameImage={downloadFrameImage}
         updateFrameSchema={updateFrameSchema}
       />
     </div>
@@ -39,6 +41,7 @@ function applyPageBehavior(Component) {
           leaveMetaPage={this.props.leaveMetaPage}
           updateServiceUrl={this.updateServiceUrl.bind(this)}
           updateFrameDimensions={this.updateFrameDimensions.bind(this)}
+          downloadFrameImage={this.downloadFrameImage.bind(this)}
           updateFrameSchema={this.updateFrameSchema.bind(this)}
         />
       )
@@ -55,6 +58,12 @@ function applyPageBehavior(Component) {
       this.context.postUserMessage({
         type: 'UPDATE_FRAME_DIMENSIONS',
         payload: { nextFrameDimensions }
+      })
+    }
+
+    downloadFrameImage() {
+      this.context.postUserMessage({
+        type: 'DOWNLOAD_FRAME_IMAGE'
       })
     }
 

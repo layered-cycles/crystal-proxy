@@ -62,6 +62,9 @@ function* userInputProcessor() {
   while (true) {
     const userInputMessage = yield take(userInputChannel)
     switch (userInputMessage.type) {
+      case 'DOWNLOAD_FRAME_IMAGE':
+        yield call(handleDownloadFrameImage)
+        continue
       case 'UPDATE_FRAME_DIMENSIONS':
         yield call(handleUpdateFrameDimensions, userInputMessage.payload)
         continue
@@ -79,6 +82,19 @@ function* userInputProcessor() {
           `Unrecognized user input message type: ${userInputMessage.type}`
         )
     }
+  }
+}
+
+function* handleDownloadFrameImage() {
+  try {
+    const { serviceUrl, frameDimensions, frameLayers } = yield select()
+    yield call(UserInterface.downloadFrameImage, {
+      serviceUrl,
+      frameDimensions,
+      frameLayers
+    })
+  } catch {
+    // handle error
   }
 }
 

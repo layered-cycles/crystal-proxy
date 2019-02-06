@@ -39,6 +39,15 @@ const UserInterface = {
         frameLayers
       )
       resolve()
+    }),
+  downloadFrameImage: ({ serviceUrl, frameDimensions, frameLayers }) =>
+    new Promise(resolve => {
+      _UserInterface.downloadFrameImage(
+        serviceUrl,
+        frameDimensions,
+        frameLayers
+      )
+      resolve()
     })
 }
 

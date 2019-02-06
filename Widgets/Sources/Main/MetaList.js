@@ -10,6 +10,7 @@ function ListDisplay({
   updateServiceUrl,
   frameDimensions,
   updateFrameDimensions,
+  downloadFrameImage,
   updateFrameSchema
 }) {
   return (
@@ -43,6 +44,16 @@ function ListDisplay({
           label="Height"
           fullWidth
         />
+        <Button
+          className={classes.actionButton}
+          onClick={() => downloadFrameImage()}
+          variant="outlined"
+          size="large"
+          margin="normal"
+          fullWidth
+        >
+          Download Image
+        </Button>
       </MetaSection>
       <MetaSection title="Service">
         <TextField
@@ -68,7 +79,12 @@ function ListDisplay({
           }}
         />
         <label htmlFor="load-schema-button">
-          <Button variant="outlined" size="large" fullWidth>
+          <Button
+            className={classes.actionButton}
+            variant="outlined"
+            size="large"
+            fullWidth
+          >
             Load Schema
           </Button>
         </label>
@@ -78,6 +94,9 @@ function ListDisplay({
 }
 
 export default withStyles({
+  actionButton: {
+    marginTop: '16px'
+  },
   listContainer: {
     flex: '1 1 auto',
     overflow: 'scroll'

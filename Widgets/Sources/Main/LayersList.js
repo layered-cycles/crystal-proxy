@@ -9,7 +9,6 @@ import IconButton from '@material-ui/core/IconButton'
 import LaunchIcon from '@material-ui/icons/VisibilityRounded'
 import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
-import { WidgetContext } from '../setupAndRenderWidget'
 import { Typography } from '@material-ui/core'
 
 function ListDisplay({ classes, layerItems }) {
@@ -49,8 +48,6 @@ function ItemDisplay({ classes, layerIndex, frameLayer, focusLayer }) {
 
 function applyListBehavior(Component) {
   class Instance extends React.Component {
-    static contextType = WidgetContext
-
     render() {
       const frameLayers = this.props.frameLayers
       const layerItems = frameLayers.map((layer, layerIndex) => {

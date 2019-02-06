@@ -63,6 +63,34 @@ final class UserInterface {
           imageData: nextImageData)
       }
   }
+
+  func _downloadFrameImage(
+    serviceUrlString: String, 
+    frameDimensions: [String: Double], 
+    frameLayers: [AnyObject]) 
+  {
+    DispatchQueue.main.async {
+      let savePanel = NSSavePanel()
+      savePanel.allowedFileTypes = ["png"]
+      savePanel.beginSheetModal(
+        for: self.mainWindowController.window!)
+      {
+        response in 
+        if response == .OK {
+          CrystalService.renderFrameImage(
+            serviceUrlString: serviceUrlString,
+            frameDimensions: frameDimensions, 
+            frameLayers: frameLayers) {
+              imageData in
+              if imageData.isEmpty { return }
+              try! imageData.write(
+                to: savePanel.url!,
+                options: [.atomic])
+            }
+        }
+      }
+    }
+  }
 }
 
 extension UserInterface: StatefulCoreService {
@@ -74,7 +102,8 @@ extension UserInterface: StatefulCoreService {
     return [
       "launch": launch,
       "hydrateMainWidget": hydrateMainWidget,
-      "hydrateImageViewer": hydrateImageViewer
+      "hydrateImageViewer": hydrateImageViewer,
+      "downloadFrameImage": downloadFrameImage
     ]
   }
 
@@ -88,6 +117,10 @@ extension UserInterface: StatefulCoreService {
 
   var hydrateImageViewer: @convention(block) (String, [String: Double], [AnyObject]) -> () {
     return self._hydrateImageViewer
+  }
+
+  var downloadFrameImage: @convention(block) (String, [String: Double], [AnyObject]) -> () {
+    return self._downloadFrameImage
   }
 }
 
