@@ -1,7 +1,17 @@
 const CrystalService = {
   loadFrameSchema: ({ serviceUrl, schemaSource }) =>
-    new Promise(resolve => {
-      _CrystalService.loadFrameSchema(serviceUrl, schemaSource, () => resolve())
+    new Promise((resolve, reject) => {
+      _CrystalService.loadFrameSchema(
+        serviceUrl,
+        schemaSource,
+        responseCode => {
+          if (responseCode === 200) {
+            resolve()
+          } else {
+            reject()
+          }
+        }
+      )
     })
 }
 

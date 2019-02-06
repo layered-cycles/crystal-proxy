@@ -102,11 +102,15 @@ function* handleUpdateFrameLayer({ nextLayer, nextIndex }) {
 }
 
 function* handleUpdateFrameSchema({ nextSchemaSource }) {
-  const { serviceUrl } = yield select()
-  yield call(CrystalService.loadFrameSchema, {
-    serviceUrl,
-    schemaSource: nextSchemaSource
-  })
+  try {
+    const { serviceUrl } = yield select()
+    yield call(CrystalService.loadFrameSchema, {
+      serviceUrl,
+      schemaSource: nextSchemaSource
+    })
+  } catch {
+    // handle error
+  }
 }
 
 function* handleUpdateServiceUrl({ nextServiceUrl }) {
@@ -133,11 +137,15 @@ function* mainWidgetHydrator() {
 function* imageViewerHydrator() {
   while (true) {
     yield take(['FRAME_LAYER_UPDATED'])
-    const { serviceUrl, frameDimensions, frameLayers } = yield select()
-    yield call(UserInterface.hydrateImageViewer, {
-      serviceUrl,
-      frameDimensions,
-      frameLayers
-    })
+    try {
+      const { serviceUrl, frameDimensions, frameLayers } = yield select()
+      yield call(UserInterface.hydrateImageViewer, {
+        serviceUrl,
+        frameDimensions,
+        frameLayers
+      })
+    } catch {
+      // handle error
+    }
   }
 }

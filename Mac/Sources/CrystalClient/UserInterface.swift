@@ -58,6 +58,7 @@ final class UserInterface {
       frameDimensions: frameDimensions, 
       frameLayers: frameLayers) {
         nextImageData in
+        if nextImageData.isEmpty { return }
         self.imageWindowController.updateImage(
           imageData: nextImageData)
       }

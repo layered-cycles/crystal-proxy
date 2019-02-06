@@ -26,7 +26,6 @@ function ItemDisplay({ classes, layerIndex, frameLayer, focusLayer }) {
       <ListItemAvatar>
         <Avatar className={classes.layerIndex}>{layerIndex}</Avatar>
       </ListItemAvatar>
-      {/* <ListItemText primary={frameLayer.type} /> */}
       <ListItemText disableTypography>
         <Typography className={classes.typeText}>{frameLayer.type}</Typography>
       </ListItemText>

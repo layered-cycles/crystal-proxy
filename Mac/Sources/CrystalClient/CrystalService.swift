@@ -7,6 +7,7 @@ enum CrystalService {
     schemaSourceString: String, 
     completionHandler: JSValue) 
   {
+    //
     Alamofire
       .request(
         "\(serviceUrlString)/api", 
@@ -21,8 +22,9 @@ enum CrystalService {
       .response 
     { 
       response in
+      let statusCode = response.response!.statusCode
       completionHandler.call(
-        withArguments: [])  
+        withArguments: [statusCode])  
     }
   }
 

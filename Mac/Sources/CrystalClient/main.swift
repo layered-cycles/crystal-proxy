@@ -24,9 +24,9 @@
       .window!
       .orderFrontRegardless()
     userInterface
-    .imageWindowController
-    .window!
-    .orderFrontRegardless()
+      .imageWindowController
+      .window!
+      .orderFrontRegardless()
   }
 }
 

@@ -58,6 +58,7 @@ function ListDisplay({
           className={classes.hiddenFileInput}
           id="load-schema-button"
           type="file"
+          value=""
           onChange={changeEvent => {
             const sourceFile = changeEvent.target.files[0]
             const sourceReader = new FileReader()
