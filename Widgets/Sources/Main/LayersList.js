@@ -12,6 +12,13 @@ import { withStyles } from '@material-ui/core/styles'
 import { Typography } from '@material-ui/core'
 
 function ListDisplay({ classes, layerItems }) {
+  if (!layerItems.length) {
+    return (
+      <div className={classes.emptyListContainer}>
+        <Typography className={classes.emptyFont}>No Layers</Typography>
+      </div>
+    )
+  }
   return (
     <div className={classes.listContainer}>
       <List>{layerItems}</List>
@@ -74,6 +81,18 @@ const ListDisplayWithStyles = withStyles({
   listContainer: {
     flex: '1 1 auto',
     overflow: 'scroll'
+  },
+  emptyFont: {
+    fontSize: '16px',
+    fontFamily: 'Roboto',
+    fontStyle: 'italic',
+    fontWeight: 400
+  },
+  emptyListContainer: {
+    flex: '1 0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 })(ListDisplay)
 const ItemDisplayWithStyles = withStyles(theme => ({

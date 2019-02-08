@@ -3,7 +3,8 @@ const Path = require('path')
 module.exports = {
   mode: 'development',
   entry: {
-    main: Path.resolve(__dirname, '../Widgets/Sources/Main/index.js')
+    main: Path.resolve(__dirname, '../Widgets/Sources/Main/index.js'),
+    image: Path.resolve(__dirname, '../Widgets/Sources/NoImage.js')
   },
   output: {
     filename: '[name].widget.js',
@@ -21,6 +22,14 @@ module.exports = {
             plugins: ['@babel/plugin-proposal-class-properties']
           }
         }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.ttf$/,
+        use: ['url-loader']
       }
     ]
   }

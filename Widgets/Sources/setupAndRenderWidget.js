@@ -2,15 +2,13 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import Grey from '@material-ui/core/colors/grey'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import './global.css'
 
 const crystalTheme = createMuiTheme({
   palette: {
     primary: {
       main: Grey[600]
     }
-  },
-  typography: {
-    useNextVariants: true
   }
 })
 
@@ -50,12 +48,7 @@ function setupAndRenderWidget(Widget) {
     }
 
     render() {
-      return [
-        <link
-          key="roboto-font-link"
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
-        />,
+      return (
         <WidgetContext.Provider
           key="widget-context-provider"
           value={{
@@ -66,7 +59,7 @@ function setupAndRenderWidget(Widget) {
             <Widget {...this.state.widgetState} />
           </MuiThemeProvider>
         </WidgetContext.Provider>
-      ]
+      )
     }
   }
   // match color of NSWindow.titleBar

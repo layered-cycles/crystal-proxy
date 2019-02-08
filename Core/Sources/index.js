@@ -21,8 +21,8 @@ function reducer(state = createInitialState(), action) {
 function createInitialState() {
   return {
     frameDimensions: {
-      width: 512,
-      height: 512
+      width: 644,
+      height: 644
     },
     frameLayers: [],
     serviceUrl: 'http://localhost:3000'

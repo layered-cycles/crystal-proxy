@@ -58,8 +58,11 @@ final class UserInterface {
       frameDimensions: frameDimensions, 
       frameLayers: frameLayers) {
         nextImageData in
-        if nextImageData.isEmpty { return }
-        self.imageWindowController.updateImage(
+        if nextImageData.isEmpty || frameLayers.count == 0 {
+          self.imageWindowController.displayNoImage()
+          return 
+        }
+        self.imageWindowController.displayImage(
           imageData: nextImageData)
       }
   }
@@ -147,10 +150,10 @@ final class MainWindowController: NSWindowController {
       blue: 246.0 / 255,
       alpha: 1.0)
     mainWidgetWindow.titlebarAppearsTransparent = true
-    mainWidgetWindow.title = "Main"
+    mainWidgetWindow.title = ""
     mainWidgetWindow.styleMask = NSWindow.StyleMask(rawValue:
       NSWindow.StyleMask.titled.rawValue |
-      NSWindow.StyleMask.closable.rawValue |
+      // NSWindow.StyleMask.closable.rawValue |
       NSWindow.StyleMask.miniaturizable.rawValue)
     super.init(
       window: mainWidgetWindow)
@@ -175,17 +178,13 @@ final class MainViewController: NSViewController, WKUIDelegate {
     webView = WKWebView(
       frame: .zero, 
       configuration: webConfiguration)
-    webView.uiDelegate = self        
-    view = webView
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
+    webView.uiDelegate = self  
     let widgetScriptUrl = URL(
       fileURLWithPath: "./main.widget.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     webView.evaluateJavaScript(widgetScript)
+    view = webView
   }
 
   init() {
@@ -227,8 +226,8 @@ final class ImageWindowController: NSWindowController {
   init() {
     let imageViewerWindow = NSWindow(
       contentViewController: viewController)
-    let initialWidth = 512.0
-    let initialHeight = 512.0
+    let initialWidth = 644.0
+    let initialHeight = 644.0
     let initialContentSize = NSSize(
       width: initialWidth,
       height: initialHeight)      
@@ -244,21 +243,34 @@ final class ImageWindowController: NSWindowController {
       blue: 246.0 / 255,
       alpha: 1.0)
     imageViewerWindow.titlebarAppearsTransparent = true
-    imageViewerWindow.title = "Image"
+    imageViewerWindow.title = ""
     imageViewerWindow.styleMask = NSWindow.StyleMask(rawValue:
       NSWindow.StyleMask.titled.rawValue |
-      NSWindow.StyleMask.closable.rawValue |
+      // NSWindow.StyleMask.closable.rawValue |
       NSWindow.StyleMask.miniaturizable.rawValue)
     super.init(
       window: imageViewerWindow)
     self.showWindow(self)
   }
 
-  func updateImage(imageData: Data) {
+  func displayImage(imageData: Data) {              
+    if viewController.view.subviews[0] != viewController.imageView {
+      viewController.webView.removeFromSuperview()   
+      viewController.view.addSubview(viewController.imageView)          
+    }
     let newImage = NSImage(
       data: imageData)!
-    viewController.imageView.image = newImage
+    viewController.imageView.image = newImage 
     window!.setContentSize(newImage.size)
+    viewController.imageView.frame = viewController.view.frame
+  }
+
+  func displayNoImage() {
+    if viewController.view.subviews[0] != viewController.webView {
+      viewController.imageView.removeFromSuperview()      
+      viewController.view.addSubview(viewController.webView)
+      viewController.webView.frame = viewController.view.frame
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -266,16 +278,36 @@ final class ImageWindowController: NSWindowController {
   }
 }
 
-final class ImageViewController: NSViewController {
+final class ImageViewController: NSViewController, WKUIDelegate {
   var imageView: NSImageView!
+  var webView: WKWebView!
 
   override func loadView() {
+    view = NSView()    
+    let webConfiguration = WKWebViewConfiguration()
+    webConfiguration
+      .preferences
+      .setValue(true, 
+        forKey: "developerExtrasEnabled")
+    webView = WKWebView(
+      frame: .zero, 
+      configuration: webConfiguration)    
+    webView.autoresizingMask = NSView.AutoresizingMask(rawValue: 
+      NSView.AutoresizingMask.width.rawValue | 
+      NSView.AutoresizingMask.height.rawValue)
+    webView.uiDelegate = self  
+    let widgetScriptUrl = URL(
+      fileURLWithPath: "./image.widget.js")
+    let widgetScript = try! String(
+      contentsOf: widgetScriptUrl)
+    webView.evaluateJavaScript(widgetScript)
+    view.addSubview(webView)
+    
     if #available(macOS 10.12, *) {
       let emptyImage = NSImage()
       imageView = NSImageView(
-        image: emptyImage)
-      view = imageView
-    }    
+        image: emptyImage)            
+    }
   }
 
   init() {
