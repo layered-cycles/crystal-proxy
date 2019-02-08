@@ -54,7 +54,7 @@ function copyMacExecutableToStage() {
     console.log('copying mac executable to stage...')
     console.log('')
     Child.exec(
-      'cp ../Mac/.build/x86_64-apple-macosx10.10/debug/CrystalClient ./Stage',
+      'cp ../Mac/.build/x86_64-apple-macosx10.10/debug/Crystal ./Stage',
       copyError => {
         if (copyError) throw copyError
         resolve()
@@ -72,7 +72,7 @@ function killMacExecutable() {
   return new Promise(resolve => {
     console.log('killing mac executable...')
     console.log('')
-    Child.exec('pkill -f CrystalClient', () => resolve())
+    Child.exec('pkill -f Crystal', () => resolve())
   })
 }
 
@@ -80,7 +80,7 @@ function runMacExecutable() {
   return new Promise(resolve => {
     console.log('running mac executable...')
     console.log('')
-    Child.spawn('./CrystalClient', [], {
+    Child.spawn('./Crystal', [], {
       cwd: './Stage',
       stdio: 'inherit'
     })
