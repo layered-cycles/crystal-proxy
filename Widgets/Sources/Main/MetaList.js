@@ -23,7 +23,19 @@ function ListDisplay({
               width: Number(changeEvent.target.value)
             })
           }
+          onBlur={() => {
+            if (frameDimensions.width < 256 || frameDimensions.width > 2048) {
+              updateFrameDimensions({
+                ...frameDimensions,
+                width: frameDimensions.width < 256 ? 256 : 2048
+              })
+            }
+          }}
           value={frameDimensions.width}
+          inputProps={{
+            min: '256',
+            max: '2048'
+          }}
           type="number"
           variant="outlined"
           margin="normal"
@@ -38,6 +50,18 @@ function ListDisplay({
               height: Number(changeEvent.target.value)
             })
           }
+          onBlur={() => {
+            if (frameDimensions.height < 256 || frameDimensions.height > 2048) {
+              updateFrameDimensions({
+                ...frameDimensions,
+                height: frameDimensions.height < 256 ? 256 : 2048
+              })
+            }
+          }}
+          inputProps={{
+            min: '256',
+            max: '2048'
+          }}
           type="number"
           variant="outlined"
           margin="normal"
