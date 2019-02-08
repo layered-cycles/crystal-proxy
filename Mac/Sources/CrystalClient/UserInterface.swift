@@ -260,8 +260,12 @@ final class ImageWindowController: NSWindowController {
     }
     let newImage = NSImage(
       data: imageData)!
-    viewController.imageView.image = newImage 
+    viewController.imageView.image = newImage
+    let staleWindowFrame = window!.frame     
     window!.setContentSize(newImage.size)
+    window!.setFrameTopLeftPoint(NSPoint(
+      x: staleWindowFrame.minX,
+      y: staleWindowFrame.maxY))
     viewController.imageView.frame = viewController.view.frame
   }
 
