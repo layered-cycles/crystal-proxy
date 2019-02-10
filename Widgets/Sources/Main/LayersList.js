@@ -106,7 +106,8 @@ const ItemDisplayWithStyles = withStyles(theme => ({
   layerIndex: {
     color: theme.palette.text.primary,
     backgroundColor: 'transparent',
-    fontWeight: 500
+    fontWeight: 500,
+    marginLeft: '-1px'
   }
 }))(ItemDisplay)
 export default applyListBehavior(ListDisplayWithStyles)

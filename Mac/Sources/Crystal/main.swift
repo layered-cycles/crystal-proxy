@@ -1,6 +1,13 @@
  import Cocoa
- 
- class AppDelegate: NSObject, NSApplicationDelegate {
+
+let ICON_URL = Bundle
+  .main
+  .resourceURL!
+  .appendingPathComponent("CrystalIcon.png")
+let ICON_IMAGE = NSImage(
+  contentsOf: ICON_URL)!
+
+class AppDelegate: NSObject, NSApplicationDelegate {
   let userInterface = UserInterface()
 
   func applicationDidFinishLaunching(
@@ -12,6 +19,11 @@
       action: nil, 
       keyEquivalent: "")
     let columnMenu = NSMenu()
+    // columnMenu.addItem(
+    //   withTitle: "About", 
+    //   action: #selector(self.displayAboutPanel), 
+    //   keyEquivalent: "")
+    // columnMenu.addItem(NSMenuItem.separator())
     columnMenu.addItem(
       withTitle: "Quit", 
       action: #selector(NSApplication.terminate(_:)), 
@@ -21,7 +33,8 @@
     NSApp.mainMenu = mainMenu
     NSApp.setActivationPolicy(.regular)
     NSApp.activate(
-      ignoringOtherApps: true)
+      ignoringOtherApps: true)    
+    NSApplication.shared.applicationIconImage = ICON_IMAGE
     let clientCoreBundle =
       try! Core.read(
         scriptAtPath: "./client-core.js")
@@ -31,18 +44,17 @@
         Console.coreService,
         userInterface.coreService,
         CrystalService.coreService
-      ])
+      ])    
+    userInterface.mainWindowController.showWindow(nil)
   }
 
-  func applicationDidBecomeActive(_ notification: Notification) {
-    userInterface
-      .mainWindowController
-      .window!
-      .orderFrontRegardless()
-    userInterface
-      .imageWindowController
-      .window!
-      .orderFrontRegardless()
+  @objc func displayAboutPanel() {
+    if #available(macOS 10.13, *) {      
+      NSApplication.shared.orderFrontStandardAboutPanel(options: [
+        NSApplication.AboutPanelOptionKey.applicationIcon: ICON_IMAGE,
+        NSApplication.AboutPanelOptionKey.applicationVersion: "Version 0.1.0"
+      ])
+    }
   }
 }
 

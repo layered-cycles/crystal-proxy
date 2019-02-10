@@ -11,6 +11,7 @@ createSagaCore({ initializer })
 
 function* initializer() {
   yield call(makeStageDirectory)
+  yield call(copyAppIconToStage)
   yield call(updateMacExecutable)
   yield spawn(macExecutableProcessor)
   yield spawn(coreBundleProcessor)
@@ -23,6 +24,17 @@ function makeStageDirectory() {
     console.log('')
     Child.exec('mkdir -p Stage', makeError => {
       if (makeError) throw makeError
+      resolve()
+    })
+  })
+}
+
+function copyAppIconToStage() {
+  return new Promise(resolve => {
+    console.log('copying app icon to stage...')
+    console.log('')
+    Child.exec('cp ../Mac/CrystalIcon.png ./Stage', copyError => {
+      if (copyError) throw copyError
       resolve()
     })
   })

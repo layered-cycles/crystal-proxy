@@ -45,7 +45,6 @@ export default withStyles({
     flexGrow: 1
   },
   metaButton: {
-    marginLeft: -10,
-    marginRight: 6
+    marginLeft: '-10px'
   }
 })(HeaderDisplay)

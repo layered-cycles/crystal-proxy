@@ -5,13 +5,15 @@ import Vapor
 
 final class UserInterface {
   var mainWindowController: MainWindowController!
-  var imageWindowController: ImageWindowController!
 
   func _launch(userInputMessageHandler: JSValue) {
     _startWebsocketServer(
       userInputMessageHandler: userInputMessageHandler) 
-    imageWindowController = ImageWindowController()
-    mainWindowController = MainWindowController()    
+    mainWindowController = MainWindowController()
+  }
+
+  func _launchImageViewer() {
+    mainWindowController.launchImageViewer()
   }
 
   func _startWebsocketServer(userInputMessageHandler: JSValue) {
@@ -57,12 +59,12 @@ final class UserInterface {
       serviceUrlString: serviceUrlString,
       frameDimensions: frameDimensions, 
       frameLayers: frameLayers) {
-        nextImageData in
+        nextImageData in        
         if nextImageData.isEmpty || frameLayers.count == 0 {
-          self.imageWindowController.displayNoImage()
+          self.mainWindowController.displayNoImage()
           return 
         }
-        self.imageWindowController.displayImage(
+        self.mainWindowController.displayImage(
           imageData: nextImageData)
       }
   }
@@ -104,6 +106,7 @@ extension UserInterface: StatefulCoreService {
   var api: Core.Service.Api {
     return [
       "launch": launch,
+      "launchImageViewer": launchImageViewer,
       "hydrateMainWidget": hydrateMainWidget,
       "hydrateImageViewer": hydrateImageViewer,
       "downloadFrameImage": downloadFrameImage
@@ -112,6 +115,10 @@ extension UserInterface: StatefulCoreService {
 
   var launch: @convention(block) (JSValue) -> () {
     return self._launch
+  }
+
+  var launchImageViewer: @convention(block) () -> () {
+    return self._launchImageViewer
   }
 
   var hydrateMainWidget: @convention(block) (String) -> () {
@@ -129,35 +136,86 @@ extension UserInterface: StatefulCoreService {
 
 final class MainWindowController: NSWindowController {
   let viewController =  MainViewController()
+  let imageViewController = ImageViewController()
 
   init() {
     let mainWidgetWindow = NSWindow(
       contentViewController: viewController)
-    let initialWidth = 338.0
-    let initialHeight = 644.0
-    let initialContentSize = NSSize(
-      width: initialWidth,
-      height: initialHeight)
-    mainWidgetWindow
-      .setContentSize(initialContentSize)
-    mainWidgetWindow.setFrameTopLeftPoint(
-      NSPoint(
-        x: 8, 
-        y: NSScreen.main!.frame.height - 32))
+    mainWidgetWindow.animationBehavior = .documentWindow
     mainWidgetWindow.backgroundColor = NSColor(
-      red: 246.0 / 255,
-      green: 246.0 / 255,
-      blue: 246.0 / 255,
+      red: 246.0/255,
+      green: 246.0/255,
+      blue: 246.0/255,
       alpha: 1.0)
+      
     mainWidgetWindow.titlebarAppearsTransparent = true
     mainWidgetWindow.title = ""
     mainWidgetWindow.styleMask = NSWindow.StyleMask(rawValue:
       NSWindow.StyleMask.titled.rawValue |
-      // NSWindow.StyleMask.closable.rawValue |
       NSWindow.StyleMask.miniaturizable.rawValue)
+    let contentSize = NSSize(
+      width: 337.0,
+      height: 644.0)
+    mainWidgetWindow
+      .setContentSize(contentSize)
+    mainWidgetWindow.setFrameTopLeftPoint(
+      NSPoint(
+        x: 8, 
+        y: NSScreen.main!.frame.height - 32))
     super.init(
-      window: mainWidgetWindow)
-    self.showWindow(self)    
+      window: mainWidgetWindow)         
+  }
+
+  func launchImageViewer() {    
+    DispatchQueue.main.async {      
+      let imageViewerWindow = NSWindow(
+        contentViewController: self.imageViewController)
+      imageViewerWindow.animationBehavior = .documentWindow
+      let contentSize = NSSize(
+        width: 644.0,
+        height: 644.0)      
+      imageViewerWindow
+        .setContentSize(contentSize)
+      imageViewerWindow.setFrameTopLeftPoint(
+        NSPoint(
+          x: 360, 
+          y: NSScreen.main!.frame.height - 32))
+      imageViewerWindow.backgroundColor = NSColor(
+          red: 246.0 / 255,
+          green: 246.0 / 255,
+          blue: 246.0 / 255,
+          alpha: 1.0)
+      imageViewerWindow.titlebarAppearsTransparent = true
+      imageViewerWindow.title = ""
+      imageViewerWindow.styleMask = NSWindow.StyleMask.titled
+      self.window!.addChildWindow(imageViewerWindow, 
+        ordered: .below)
+    }
+  }
+
+  func displayImage(imageData: Data) {              
+    if imageViewController.view.subviews[0] != imageViewController.imageView {
+      imageViewController.webView.removeFromSuperview()   
+      imageViewController.view.addSubview(imageViewController.imageView)          
+    }
+    let imageWindow = window!.childWindows![0]
+    let newImage = NSImage(
+      data: imageData)!
+    imageViewController.imageView.image = newImage
+    let staleWindowFrame = imageWindow.frame     
+    imageWindow.setContentSize(newImage.size)
+    imageWindow.setFrameTopLeftPoint(NSPoint(
+      x: staleWindowFrame.minX,
+      y: staleWindowFrame.maxY))
+    imageViewController.imageView.frame = imageViewController.view.frame
+  }
+
+  func displayNoImage() {
+    if imageViewController.view.subviews[0] != imageViewController.webView {
+      imageViewController.imageView.removeFromSuperview()      
+      imageViewController.view.addSubview(imageViewController.webView)
+      imageViewController.webView.frame = imageViewController.view.frame
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -169,7 +227,10 @@ final class MainViewController: NSViewController, WKUIDelegate {
   var webView: WKWebView!
   var webSocket: WebSocket!
 
-  override func loadView() {
+  init() {
+    super.init(
+      nibName: nil, 
+      bundle: nil)      
     let webConfiguration = WKWebViewConfiguration()
     webConfiguration
       .preferences
@@ -177,20 +238,28 @@ final class MainViewController: NSViewController, WKUIDelegate {
         forKey: "developerExtrasEnabled")
     webView = WKWebView(
       frame: .zero, 
-      configuration: webConfiguration)
+      configuration: webConfiguration)      
+    webView.set(
+      backgroundColor: NSColor(
+        red: 117.0/255,
+        green: 117.0/255,
+        blue: 117.0/255,
+        alpha: 1.0))  
+    webView.autoresizingMask = NSView.AutoresizingMask(rawValue: 
+      NSView.AutoresizingMask.width.rawValue | 
+      NSView.AutoresizingMask.height.rawValue)
     webView.uiDelegate = self  
+    let loaderScriptUrl = URL(
+      fileURLWithPath: "./loader.widget.js")
+    let loaderScript = try! String(
+      contentsOf: loaderScriptUrl)
+    webView.evaluateJavaScript(loaderScript)
     let widgetScriptUrl = URL(
       fileURLWithPath: "./main.widget.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     webView.evaluateJavaScript(widgetScript)
     view = webView
-  }
-
-  init() {
-    super.init(
-      nibName: nil, 
-      bundle: nil)      
   }
 
   required init?(coder: NSCoder) {
@@ -220,68 +289,6 @@ extension MainViewController {
   }
 }
 
-final class ImageWindowController: NSWindowController {
-  let viewController = ImageViewController()
-
-  init() {
-    let imageViewerWindow = NSWindow(
-      contentViewController: viewController)
-    let initialWidth = 644.0
-    let initialHeight = 644.0
-    let initialContentSize = NSSize(
-      width: initialWidth,
-      height: initialHeight)      
-    imageViewerWindow
-      .setContentSize(initialContentSize)
-    imageViewerWindow.setFrameTopLeftPoint(
-      NSPoint(
-        x: 360, 
-        y: NSScreen.main!.frame.height - 32))
-    imageViewerWindow.backgroundColor = NSColor(
-      red: 246.0 / 255,
-      green: 246.0 / 255,
-      blue: 246.0 / 255,
-      alpha: 1.0)
-    imageViewerWindow.titlebarAppearsTransparent = true
-    imageViewerWindow.title = ""
-    imageViewerWindow.styleMask = NSWindow.StyleMask(rawValue:
-      NSWindow.StyleMask.titled.rawValue |
-      // NSWindow.StyleMask.closable.rawValue |
-      NSWindow.StyleMask.miniaturizable.rawValue)
-    super.init(
-      window: imageViewerWindow)
-    self.showWindow(self)
-  }
-
-  func displayImage(imageData: Data) {              
-    if viewController.view.subviews[0] != viewController.imageView {
-      viewController.webView.removeFromSuperview()   
-      viewController.view.addSubview(viewController.imageView)          
-    }
-    let newImage = NSImage(
-      data: imageData)!
-    viewController.imageView.image = newImage
-    let staleWindowFrame = window!.frame     
-    window!.setContentSize(newImage.size)
-    window!.setFrameTopLeftPoint(NSPoint(
-      x: staleWindowFrame.minX,
-      y: staleWindowFrame.maxY))
-    viewController.imageView.frame = viewController.view.frame
-  }
-
-  func displayNoImage() {
-    if viewController.view.subviews[0] != viewController.webView {
-      viewController.imageView.removeFromSuperview()      
-      viewController.view.addSubview(viewController.webView)
-      viewController.webView.frame = viewController.view.frame
-    }
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("WTF?")
-  }
-}
-
 final class ImageViewController: NSViewController, WKUIDelegate {
   var imageView: NSImageView!
   var webView: WKWebView!
@@ -306,7 +313,6 @@ final class ImageViewController: NSViewController, WKUIDelegate {
       contentsOf: widgetScriptUrl)
     webView.evaluateJavaScript(widgetScript)
     view.addSubview(webView)
-    
     if #available(macOS 10.12, *) {
       let emptyImage = NSImage()
       imageView = NSImageView(
@@ -322,5 +328,14 @@ final class ImageViewController: NSViewController, WKUIDelegate {
 
   required init?(coder: NSCoder) {
     fatalError("WTF?")
+  }
+}
+
+extension NSView {
+  func set(backgroundColor: NSColor) {
+    DispatchQueue.main.async {
+      self.wantsLayer = true
+      self.layer?.backgroundColor = backgroundColor.cgColor
+    }    
   }
 }

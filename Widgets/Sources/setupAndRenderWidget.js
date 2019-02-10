@@ -15,7 +15,7 @@ const crystalTheme = createMuiTheme({
 const WidgetContext = React.createContext()
 
 function setupAndRenderWidget(Widget) {
-  class RootBehavior extends React.Component {
+  class Root extends React.Component {
     state = {
       postUserMessage: null,
       widgetState: Widget.getDefaultState()
@@ -44,7 +44,18 @@ function setupAndRenderWidget(Widget) {
           }
         })
       })
+
       this.setState({ postUserMessage })
+      document
+        .getElementById('LOADER_ICON')
+        .addEventListener('animationend', () => {
+          document.getElementById('LOADER_CONTAINER').style.visibility =
+            'hidden'
+          document.body.style.backgroundColor = 'rgb(246,246,246)'
+          document.getElementById('WIDGET_CONTAINER').style.visibility =
+            'visible'
+          this.state.postUserMessage({ type: 'LAUNCH_IMAGE_VIEWER' })
+        })
     }
 
     render() {
@@ -63,11 +74,11 @@ function setupAndRenderWidget(Widget) {
     }
   }
   // match color of NSWindow.titleBar
-  document.body.style.backgroundColor = 'rgb(246,246,246)'
-  const rootContainer = document.createElement('div')
-  document.body.appendChild(rootContainer)
-  const rootElement = <RootBehavior />
-  ReactDOM.render(rootElement, rootContainer)
+  const widgetContainer = document.createElement('div')
+  widgetContainer.setAttribute('id', 'WIDGET_CONTAINER')
+  document.body.appendChild(widgetContainer)
+  const rootElement = <Root />
+  ReactDOM.render(rootElement, widgetContainer)
 }
 
 export default setupAndRenderWidget

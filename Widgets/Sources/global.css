@@ -1,3 +1,7 @@
+#WIDGET_CONTAINER {
+  visibility: hidden;
+}
+
 @font-face {
   font-family: 'Roboto';
   src: url('../Roboto/Roboto-Black.ttf') format('truetype');

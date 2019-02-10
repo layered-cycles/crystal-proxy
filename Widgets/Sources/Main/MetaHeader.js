@@ -26,7 +26,7 @@ export default withStyles({
     flexGrow: 1
   },
   backButton: {
-    marginLeft: -10,
+    marginLeft: '-10px',
     paddingTop: '14px',
     paddingBottom: '10px'
   }

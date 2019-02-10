@@ -4,7 +4,8 @@ module.exports = {
   mode: 'development',
   entry: {
     main: Path.resolve(__dirname, '../Widgets/Sources/Main/index.js'),
-    image: Path.resolve(__dirname, '../Widgets/Sources/NoImage.js')
+    image: Path.resolve(__dirname, '../Widgets/Sources/NoImage.js'),
+    loader: Path.resolve(__dirname, '../Widgets/Sources/Loader.js')
   },
   output: {
     filename: '[name].widget.js',

@@ -1,0 +1,33 @@
+.page-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(117, 117, 117);
+}
+
+.triangle-icon {
+  flex: 1 0 auto;
+  height: 100% !important;
+  animation-name: loader;
+  animation-duration: 1s;
+  animation-timing-function: ease;
+  animation-direction: alternate;
+  animation-iteration-count: 6;
+}
+
+@keyframes loader {
+  0% {
+    fill: rgb(117, 117, 117);
+  }
+  33% {
+    fill: rgb(117, 117, 117);
+  }
+  100% {
+    fill: white;
+  }
+}

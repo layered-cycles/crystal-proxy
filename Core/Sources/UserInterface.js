@@ -18,6 +18,9 @@ const UserInterface = {
               _selectMainWidgetState = selectWidgetStateWrapper
               _hydrateMainWidget(initialCoreState)
               return
+            case 'LAUNCH_IMAGE_VIEWER':
+              _UserInterface.launchImageViewer()
+              return
             default:
               emitMessage(userInterfaceMessage)
           }
