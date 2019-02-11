@@ -1,7 +1,7 @@
 import React from 'react'
 import setupAndRenderWidget from '../setupAndRenderWidget'
-import LayersPage from './LayersPage'
-import MetaPage from './MetaPage'
+import LayersPage from './LayersPage/index.js'
+import MetaPage from './MetaPage/index.js'
 
 const DisplayMode = {
   LAYERS: 'LAYERS__DISPLAY_MODE',
@@ -12,30 +12,30 @@ const MainWidget = applyWidgetBehavior(WidgetDisplay)
 setupAndRenderWidget(MainWidget)
 
 function WidgetDisplay({
-  displayMode,
-  enterMetaPage,
+  _displayMode,
+  _enterMetaPage,
   frameLayers,
   frameDimensions,
-  leaveMetaPage,
+  _leaveMetaPage,
   serviceUrl
 }) {
-  switch (displayMode) {
+  switch (_displayMode) {
     case DisplayMode.LAYERS:
       return (
-        <LayersPage enterMetaPage={enterMetaPage} frameLayers={frameLayers} />
+        <LayersPage enterMetaPage={_enterMetaPage} frameLayers={frameLayers} />
       )
     case DisplayMode.META:
       return (
         <MetaPage
           frameDimensions={frameDimensions}
-          leaveMetaPage={leaveMetaPage}
+          leaveMetaPage={_leaveMetaPage}
           serviceUrl={serviceUrl}
         />
       )
   }
 }
 
-function applyWidgetBehavior(Component) {
+function applyWidgetBehavior(DisplayComponent) {
   class Instance extends React.Component {
     state = {
       displayMode: DisplayMode.LAYERS
@@ -43,13 +43,13 @@ function applyWidgetBehavior(Component) {
 
     render() {
       return (
-        <Component
+        <DisplayComponent
           frameDimensions={this.props.frameDimensions}
           frameLayers={this.props.frameLayers}
           serviceUrl={this.props.serviceUrl}
-          displayMode={this.state.displayMode}
-          enterMetaPage={this.enterMetaPage.bind(this)}
-          leaveMetaPage={this.leaveMetaPage.bind(this)}
+          _displayMode={this.state.displayMode}
+          _enterMetaPage={this.enterMetaPage.bind(this)}
+          _leaveMetaPage={this.leaveMetaPage.bind(this)}
         />
       )
     }

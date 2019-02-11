@@ -4,9 +4,9 @@
   "private": true,
   "workspaces": {
     "packages": [
+      "ClientComponents",
       "Core",
-      "Development",
-      "Widgets"
+      "Development"
     ]
   },
   "scripts": {

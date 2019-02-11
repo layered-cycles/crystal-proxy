@@ -1,25 +1,25 @@
 import React from 'react'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/ClearRounded'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import TextField from '@material-ui/core/TextField'
 import DialogActions from '@material-ui/core/DialogActions'
-import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/ClearRounded'
-import ArrowBackIoIcon from '@material-ui/icons/ArrowBackIosRounded'
-import ArrowForwardIoIcon from '@material-ui/icons/ArrowForwardIosRounded'
+import BackoutChangesIcon from '@material-ui/icons/ArrowBackIosRounded'
+import ForwardChangesIcon from '@material-ui/icons/ArrowForwardIosRounded'
 import { withStyles } from '@material-ui/core/styles'
-import { WidgetContext } from '../setupAndRenderWidget'
+import { WIDGET_CONTEXT } from '../../setupAndRenderWidget'
 
 function DialogDisplay({
   layerIsNotNew,
   _deleteLayer,
+  classes,
   unfocusLayer,
   _open,
   layerIndex,
   _updateJsonValueString,
   _jsonValueString,
-  classes,
   _backoutLayerChanges,
   _forwardLayerChanges
 }) {
@@ -57,10 +57,10 @@ function DialogDisplay({
         {maybeDeleteButton}
         <div className={classes.buttonSpacer} />
         <IconButton onClick={_backoutLayerChanges}>
-          <ArrowBackIoIcon className={classes.actionIcon} />
+          <BackoutChangesIcon className={classes.actionIcon} />
         </IconButton>
         <IconButton onClick={_forwardLayerChanges}>
-          <ArrowForwardIoIcon className={classes.actionIcon} />
+          <ForwardChangesIcon className={classes.actionIcon} />
         </IconButton>
       </DialogActions>
     </Dialog>
@@ -69,7 +69,7 @@ function DialogDisplay({
 
 function applyDialogBehavior(DisplayComponent) {
   class Instance extends React.Component {
-    static contextType = WidgetContext
+    static contextType = WIDGET_CONTEXT
 
     constructor(props) {
       super(props)
@@ -137,11 +137,11 @@ function applyDialogBehavior(DisplayComponent) {
 }
 
 const DialogDisplayWithStyles = withStyles(theme => ({
-  buttonSpacer: {
-    flex: '1 0 auto'
-  },
   actionIcon: {
     color: theme.palette.primary.main
+  },
+  buttonSpacer: {
+    flex: '1 0 auto'
   }
 }))(DialogDisplay)
 export default applyDialogBehavior(DialogDisplayWithStyles)

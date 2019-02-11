@@ -10,7 +10,7 @@
   background-color: rgb(117, 117, 117);
 }
 
-.triangle-icon {
+.app-icon {
   flex: 1 0 auto;
   height: 100% !important;
   animation-name: loader;

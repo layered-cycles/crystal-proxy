@@ -247,7 +247,7 @@ final class MainViewController: NSViewController, WKUIDelegate {
       NSView.AutoresizingMask.height.rawValue)
     webView.uiDelegate = self  
     let loaderScriptUrl = URL(
-      fileURLWithPath: "./loader.widget.js")
+      fileURLWithPath: "./mainloading.display.js")
     let loaderScript = try! String(
       contentsOf: loaderScriptUrl)
     webView.evaluateJavaScript(loaderScript)
@@ -305,7 +305,7 @@ final class ImageViewController: NSViewController, WKUIDelegate {
       NSView.AutoresizingMask.height.rawValue)
     webView.uiDelegate = self  
     let widgetScriptUrl = URL(
-      fileURLWithPath: "./image.widget.js")
+      fileURLWithPath: "./noimage.display.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     webView.evaluateJavaScript(widgetScript)

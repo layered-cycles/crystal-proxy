@@ -2,8 +2,8 @@ import React from 'react'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import IconButton from '@material-ui/core/IconButton'
-import ChangeHistoryIcon from '@material-ui/icons/ChangeHistoryRounded'
-import AddIcon from '@material-ui/icons/AddRounded'
+import AppIcon from '@material-ui/icons/ChangeHistoryRounded'
+import FocusNewLayerIcon from '@material-ui/icons/AddRounded'
 import { withStyles } from '@material-ui/core/styles'
 
 function HeaderDisplay({ classes, enterMetaPage, focusLayer, layersLength }) {
@@ -15,7 +15,7 @@ function HeaderDisplay({ classes, enterMetaPage, focusLayer, layersLength }) {
           onClick={enterMetaPage}
           color="inherit"
         >
-          <ChangeHistoryIcon fontSize="large" />
+          <AppIcon fontSize="large" />
         </IconButton>
         <div className={classes.buttonSpacer} />
         <IconButton
@@ -33,7 +33,7 @@ function HeaderDisplay({ classes, enterMetaPage, focusLayer, layersLength }) {
           }
           color="inherit"
         >
-          <AddIcon fontSize="large" />
+          <FocusNewLayerIcon fontSize="large" />
         </IconButton>
       </Toolbar>
     </AppBar>

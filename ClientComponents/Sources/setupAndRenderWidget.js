@@ -1,21 +1,24 @@
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
 import Grey from '@material-ui/core/colors/grey'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './global.css'
+import './widget.css'
 
-const crystalTheme = createMuiTheme({
+const CRYSTAL_THEME = createMuiTheme({
   palette: {
     primary: {
       main: Grey[600]
     }
+  },
+  typography: {
+    useNextVariants: true
   }
 })
 
-const WidgetContext = React.createContext()
+const WIDGET_CONTEXT = React.createContext()
 
 function setupAndRenderWidget(Widget) {
-  class Root extends React.Component {
+  class Instance extends React.Component {
     state = {
       postUserMessage: null,
       widgetState: Widget.getDefaultState()
@@ -44,42 +47,42 @@ function setupAndRenderWidget(Widget) {
           }
         })
       })
-
-      this.setState({ postUserMessage })
       document
-        .getElementById('LOADER_ICON')
+        .getElementById('LOADING_ICON')
         .addEventListener('animationend', () => {
-          document.getElementById('LOADER_CONTAINER').style.visibility =
+          document.getElementById('LOADING_CONTAINER').style.visibility =
             'hidden'
           document.body.style.backgroundColor = 'rgb(246,246,246)'
           document.getElementById('WIDGET_CONTAINER').style.visibility =
             'visible'
-          this.state.postUserMessage({ type: 'LAUNCH_IMAGE_VIEWER' })
+          postUserMessage({
+            type: 'LAUNCH_IMAGE_VIEWER'
+          })
         })
+      this.setState({ postUserMessage })
     }
 
     render() {
       return (
-        <WidgetContext.Provider
-          key="widget-context-provider"
+        <WIDGET_CONTEXT.Provider
           value={{
             postUserMessage: this.state.postUserMessage
           }}
+          key="widget-context-provider"
         >
-          <MuiThemeProvider theme={crystalTheme}>
+          <MuiThemeProvider theme={CRYSTAL_THEME}>
             <Widget {...this.state.widgetState} />
           </MuiThemeProvider>
-        </WidgetContext.Provider>
+        </WIDGET_CONTEXT.Provider>
       )
     }
   }
-  // match color of NSWindow.titleBar
   const widgetContainer = document.createElement('div')
   widgetContainer.setAttribute('id', 'WIDGET_CONTAINER')
   document.body.appendChild(widgetContainer)
-  const rootElement = <Root />
-  ReactDOM.render(rootElement, widgetContainer)
+  const widgetElement = <Instance />
+  ReactDOM.render(widgetElement, widgetContainer)
 }
 
 export default setupAndRenderWidget
-export { WidgetContext }
+export { WIDGET_CONTEXT }

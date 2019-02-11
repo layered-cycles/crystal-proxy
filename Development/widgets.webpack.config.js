@@ -3,12 +3,21 @@ const Path = require('path')
 module.exports = {
   mode: 'development',
   entry: {
-    main: Path.resolve(__dirname, '../Widgets/Sources/Main/index.js'),
-    image: Path.resolve(__dirname, '../Widgets/Sources/NoImage.js'),
-    loader: Path.resolve(__dirname, '../Widgets/Sources/Loader.js')
+    'mainloading.display': Path.resolve(
+      __dirname,
+      '../ClientComponents/Sources/Miscellaneous/MainLoading.js'
+    ),
+    'main.widget': Path.resolve(
+      __dirname,
+      '../ClientComponents/Sources/MainWidget/index.js'
+    ),
+    'noimage.display': Path.resolve(
+      __dirname,
+      '../ClientComponents/Sources/Miscellaneous/NoImage.js'
+    )
   },
   output: {
-    filename: '[name].widget.js',
+    filename: '[name].js',
     path: Path.resolve(__dirname, './Stage')
   },
   module: {

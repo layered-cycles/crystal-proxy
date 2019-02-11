@@ -5,17 +5,20 @@ import LayersHeader from './LayersHeader'
 import LayersList from './LayersList'
 
 function PageDisplay({
-  _focusedLayer,
+  _maybeFocusedLayer,
   _unfocusLayer,
   classes,
   enterMetaPage,
   _focusLayer,
   frameLayers
 }) {
-  let dialogContent = null
-  if (_focusedLayer) {
-    dialogContent = (
-      <LayerDialog focusedLayer={_focusedLayer} unfocusLayer={_unfocusLayer} />
+  let maybeDialogContent = null
+  if (_maybeFocusedLayer) {
+    maybeDialogContent = (
+      <LayerDialog
+        focusedLayer={_maybeFocusedLayer}
+        unfocusLayer={_unfocusLayer}
+      />
     )
   }
   return (
@@ -26,23 +29,23 @@ function PageDisplay({
         layersLength={frameLayers.length}
       />
       <LayersList focusLayer={_focusLayer} frameLayers={frameLayers} />
-      {dialogContent}
+      {maybeDialogContent}
     </div>
   )
 }
 
-function applyPageBehavior(Component) {
+function applyPageBehavior(DisplayComponent) {
   class Instance extends React.Component {
     state = {
-      focusedLayer: null
+      maybeFocusedLayer: null
     }
 
     render() {
       return (
-        <Component
+        <DisplayComponent
           enterMetaPage={this.props.enterMetaPage}
           frameLayers={this.props.frameLayers}
-          _focusedLayer={this.state.focusedLayer}
+          _maybeFocusedLayer={this.state.maybeFocusedLayer}
           _focusLayer={this.focusLayer.bind(this)}
           _unfocusLayer={this.unfocusLayer.bind(this)}
         />
@@ -51,7 +54,7 @@ function applyPageBehavior(Component) {
 
     focusLayer({ nextFocusedLayer }) {
       this.setState({
-        focusedLayer: {
+        maybeFocusedLayer: {
           isNew: false,
           ...nextFocusedLayer
         }
@@ -60,7 +63,7 @@ function applyPageBehavior(Component) {
 
     unfocusLayer() {
       this.setState({
-        focusedLayer: null
+        maybeFocusedLayer: null
       })
     }
   }

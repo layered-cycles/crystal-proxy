@@ -1,12 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './global.css'
+import '../widget.css'
 
-// match color of NSWindow.titleBar
 document.body.style.backgroundColor = 'rgb(246,246,246)'
-const rootContainer = document.createElement('div')
-document.body.appendChild(rootContainer)
-const rootElement = (
+const displayContainer = document.createElement('div')
+document.body.appendChild(displayContainer)
+const displayElement = (
   <div
     style={{
       position: 'absolute',
@@ -26,4 +25,4 @@ const rootElement = (
     No Image
   </div>
 )
-ReactDOM.render(rootElement, rootContainer)
+ReactDOM.render(displayElement, displayContainer)
