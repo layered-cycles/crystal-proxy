@@ -146,9 +146,7 @@ final class MainWindowController: NSWindowController {
       red: 246.0/255,
       green: 246.0/255,
       blue: 246.0/255,
-      alpha: 1.0)
-      
-    mainWidgetWindow.titlebarAppearsTransparent = true
+      alpha: 1.0)      
     mainWidgetWindow.title = ""
     mainWidgetWindow.styleMask = NSWindow.StyleMask(rawValue:
       NSWindow.StyleMask.titled.rawValue |
@@ -185,7 +183,6 @@ final class MainWindowController: NSWindowController {
           green: 246.0 / 255,
           blue: 246.0 / 255,
           alpha: 1.0)
-      imageViewerWindow.titlebarAppearsTransparent = true
       imageViewerWindow.title = ""
       imageViewerWindow.styleMask = NSWindow.StyleMask.titled
       self.window!.addChildWindow(imageViewerWindow, 
