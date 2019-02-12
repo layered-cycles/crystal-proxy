@@ -17,11 +17,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       action: nil, 
       keyEquivalent: "")
     let columnMenu = NSMenu()
-    // columnMenu.addItem(
-    //   withTitle: "About", 
-    //   action: #selector(self.displayAboutPanel), 
-    //   keyEquivalent: "")
-    // columnMenu.addItem(NSMenuItem.separator())
+    columnMenu.addItem(
+      withTitle: "About", 
+      action: #selector(self.displayAboutPanel), 
+      keyEquivalent: "")
+    columnMenu.addItem(NSMenuItem.separator())
     columnMenu.addItem(
       withTitle: "Quit", 
       action: #selector(NSApplication.terminate(_:)), 
@@ -45,15 +45,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.clientService.javaScriptService,
         CrystalService.javaScriptService
       ])    
-    self.clientService.windowController.showWindow(nil)
+    self.clientService.windowController.showWindow(nil)    
   }
 
   @objc func displayAboutPanel() {
     if #available(macOS 10.13, *) {      
-      NSApplication.shared.orderFrontStandardAboutPanel(options: [
-        NSApplication.AboutPanelOptionKey.applicationIcon: ICON_IMAGE,
-        NSApplication.AboutPanelOptionKey.applicationVersion: "Version 0.1.0"
-      ])
+      NSApplication.shared.orderFrontStandardAboutPanel(
+        options: [
+          NSApplication.AboutPanelOptionKey.applicationIcon: ICON_IMAGE,
+          NSApplication.AboutPanelOptionKey.applicationVersion: "Version 0.1.0"
+        ])
     }
   }
 }
