@@ -33,7 +33,7 @@ function copyAppIconToStage() {
   return new Promise(resolve => {
     console.log('copying app icon to stage...')
     console.log('')
-    Child.exec('cp ../Mac/CrystalIcon.png ./Stage', copyError => {
+    Child.exec('cp ../App/CrystalIcon.png ./Stage', copyError => {
       if (copyError) throw copyError
       resolve()
     })
@@ -51,7 +51,7 @@ function buildMacExecutable() {
     console.log('building mac executable...')
     const buildProcess = Child.spawn(
       'swift',
-      ['build', '--package-path', '../Mac'],
+      ['build', '--package-path', '../App'],
       { stdio: 'inherit' }
     )
     buildProcess.on('close', () => {
@@ -66,7 +66,7 @@ function copyMacExecutableToStage() {
     console.log('copying mac executable to stage...')
     console.log('')
     Child.exec(
-      'cp ../Mac/.build/x86_64-apple-macosx10.10/debug/Crystal ./Stage',
+      'cp ../App/.build/x86_64-apple-macosx10.10/debug/Crystal ./Stage',
       copyError => {
         if (copyError) throw copyError
         resolve()
@@ -114,7 +114,7 @@ function startExecutableSourceWatcher() {
     console.log('')
     const watcherChannel = eventChannel(emitMessage => {
       createFileWatcher(
-        ['../Mac/Sources'],
+        ['../App/Sources'],
         {
           recursive: true
         },

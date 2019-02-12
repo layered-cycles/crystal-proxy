@@ -2,9 +2,9 @@ const Path = require('path')
 
 module.exports = {
   mode: 'development',
-  entry: Path.resolve(__dirname, '../Core/Sources/index.js'),
+  entry: Path.resolve(__dirname, '../ProxyCore/Sources/index.js'),
   output: {
-    filename: 'client-core.js',
+    filename: 'proxy-core.js',
     path: Path.resolve(__dirname, './Stage')
   }
 }

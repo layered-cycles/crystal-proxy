@@ -1,5 +1,5 @@
 {
-  "name": "crystal-client-development",
+  "name": "crystal-proxy-development",
   "version": "0.1.0",
   "main": "Sources/index.js",
   "private": true,

@@ -7,10 +7,8 @@ enum CrystalService {
     schemaSourceString: String, 
     completionHandler: JSValue) 
   {
-    //
     Alamofire
-      .request(
-        "\(serviceUrlString)/api", 
+      .request("\(serviceUrlString)/api", 
         method: .post, 
         parameters: [
           "type": "LOAD_FRAME_SCHEMA",
@@ -21,8 +19,8 @@ enum CrystalService {
         encoding: JSONEncoding.default)
       .response 
     { 
-      response in
-      let statusCode = response.response!.statusCode
+      alamoResponse in
+      let statusCode = alamoResponse.response!.statusCode
       completionHandler.call(
         withArguments: [statusCode])  
     }
@@ -35,8 +33,7 @@ enum CrystalService {
     completionHandler: @escaping (Data) -> ()) 
   {
     Alamofire
-      .request(
-        "\(serviceUrlString)/api", 
+      .request("\(serviceUrlString)/api", 
         method: .post, 
         parameters: [
           "type": "RENDER_FRAME_IMAGE",
@@ -49,16 +46,16 @@ enum CrystalService {
         encoding: JSONEncoding.default)
       .response 
     { 
-      response in
-      completionHandler(response.data!)
+      alamoResponse in
+      completionHandler(alamoResponse.data!)
     }
   }
 }
 
 extension CrystalService: FixedCoreService {
-  static let namespace = "_CrystalService"
+  static let namespace = "_Crystal"
   
-  static let api: Core.Service.Api = [
+  static let api: JavaScriptEngine.Service.Api = [
     "loadFrameSchema": loadFrameSchema
   ]
 

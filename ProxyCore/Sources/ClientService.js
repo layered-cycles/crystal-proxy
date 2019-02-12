@@ -5,20 +5,12 @@ let _selectMainState = null
 const ClientService = {
   downloadFrameImage: ({ serviceUrl, frameDimensions, frameLayers }) =>
     new Promise(resolve => {
-      _ClientService.downloadFrameImage(
-        serviceUrl,
-        frameDimensions,
-        frameLayers
-      )
+      _Client.downloadFrameImage(serviceUrl, frameDimensions, frameLayers)
       resolve()
     }),
-  hydrateImageViewer: ({ serviceUrl, frameDimensions, frameLayers }) =>
+  hydrateFrameImage: ({ serviceUrl, frameDimensions, frameLayers }) =>
     new Promise(resolve => {
-      _ClientService.hydrateImageViewer(
-        serviceUrl,
-        frameDimensions,
-        frameLayers
-      )
+      _Client.hydrateFrameImage(serviceUrl, frameDimensions, frameLayers)
       resolve()
     }),
   hydrateMainWidget: coreState =>
@@ -29,7 +21,7 @@ const ClientService = {
   launch: initialCoreState =>
     new Promise(resolve => {
       const clientMessageChannel = eventChannel(emitMessage => {
-        _ClientService.launch(clientMessageString => {
+        _Client.launchMainWindow(clientMessageString => {
           const clientMessage = JSON.parse(clientMessageString)
           switch (clientMessage.type) {
             case 'SETUP_MAIN_WIDGET':
@@ -42,7 +34,7 @@ const ClientService = {
               _hydrateMainWidget(initialCoreState)
               return
             case 'LAUNCH_IMAGE_VIEWER':
-              _ClientService.launchImageViewer()
+              _Client.launchImageWindow()
               return
             default:
               emitMessage(clientMessage)
@@ -61,7 +53,7 @@ function _hydrateMainWidget(coreState) {
     payload: { nextMainState }
   }
   const coreMessageString = JSON.stringify(coreMessage)
-  _ClientService.postMainMessage(coreMessageString)
+  _Client.postMainMessage(coreMessageString)
 }
 
 export default ClientService

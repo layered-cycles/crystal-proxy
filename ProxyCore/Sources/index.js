@@ -64,7 +64,7 @@ function handleServiceUrlUpdated(coreState, { serviceUrl }) {
 function* initializer() {
   yield spawn(clientProcessor)
   yield spawn(mainWidgetHydrator)
-  yield spawn(imageViewerHydrator)
+  yield spawn(frameImageHydrator)
 }
 
 function* clientProcessor() {
@@ -159,12 +159,12 @@ function* mainWidgetHydrator() {
   }
 }
 
-function* imageViewerHydrator() {
+function* frameImageHydrator() {
   while (true) {
     yield take([CoreAction.FRAME_LAYER_UPDATED])
     try {
       const { frameDimensions, frameLayers, serviceUrl } = yield select()
-      yield call(ClientService.hydrateImageViewer, {
+      yield call(ClientService.hydrateFrameImage, {
         frameDimensions,
         frameLayers,
         serviceUrl

@@ -1,14 +1,12 @@
  import Cocoa
 
-let ICON_URL = Bundle
-  .main
-  .resourceURL!
-  .appendingPathComponent("CrystalIcon.png")
+let ICON_URL = Bundle.main.resourceURL!.appendingPathComponent("CrystalIcon.png")
 let ICON_IMAGE = NSImage(
   contentsOf: ICON_URL)!
+ICON_IMAGE.setName(NSImage.applicationIconName)
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-  let userInterface = UserInterface()
+  let clientService = ClientService()
 
   func applicationDidFinishLaunching(
     _ notification: Notification) 
@@ -35,17 +33,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApp.activate(
       ignoringOtherApps: true)    
     NSApplication.shared.applicationIconImage = ICON_IMAGE
-    let clientCoreBundle =
-      try! Core.read(
-        scriptAtPath: "./client-core.js")
-    Core.launch(
-      script: clientCoreBundle,
+    let coreProxyScriptURL = URL(
+      fileURLWithPath: "./proxy-core.js")
+    let coreProxyScript = try! String(
+      contentsOf: coreProxyScriptURL, 
+      encoding: .utf8)
+    JavaScriptEngine.launch(
+      script: coreProxyScript,
       with: [
-        Console.coreService,
-        userInterface.coreService,
-        CrystalService.coreService
+        ConsoleService.javaScriptService,
+        self.clientService.javaScriptService,
+        CrystalService.javaScriptService
       ])    
-    userInterface.mainWindowController.showWindow(nil)
+    self.clientService.windowController.showWindow(nil)
   }
 
   @objc func displayAboutPanel() {
