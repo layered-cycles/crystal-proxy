@@ -1,5 +1,5 @@
 import React from 'react'
-import setupAndRenderWidget from '../setupAndRenderWidget'
+import setupAndRenderMainWidget from '../setupAndRenderMainWidget.js'
 import LayersPage from './LayersPage/index.js'
 import MetaPage from './MetaPage/index.js'
 
@@ -8,10 +8,10 @@ const DisplayMode = {
   META: 'META__DISPLAY_MODE'
 }
 
-const MainWidget = applyWidgetBehavior(WidgetDisplay)
-setupAndRenderWidget(MainWidget)
+const MainWidget = applyMainBehavior(MainDisplay)
+setupAndRenderMainWidget(MainWidget)
 
-function WidgetDisplay({
+function MainDisplay({
   _displayMode,
   _enterMetaPage,
   frameLayers,
@@ -35,7 +35,7 @@ function WidgetDisplay({
   }
 }
 
-function applyWidgetBehavior(DisplayComponent) {
+function applyMainBehavior(DisplayComponent) {
   class Instance extends React.Component {
     state = {
       displayMode: DisplayMode.LAYERS
@@ -66,11 +66,7 @@ function applyWidgetBehavior(DisplayComponent) {
       })
     }
   }
-  Instance.selectWidgetState = ({
-    frameDimensions,
-    frameLayers,
-    serviceUrl
-  }) => ({
+  Instance.selectState = ({ frameDimensions, frameLayers, serviceUrl }) => ({
     frameDimensions,
     frameLayers,
     serviceUrl

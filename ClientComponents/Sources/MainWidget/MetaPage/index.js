@@ -2,7 +2,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import MetaHeader from './MetaHeader'
 import MetaList from './MetaList'
-import { WIDGET_CONTEXT } from '../../setupAndRenderWidget'
+import { WIDGET_CONTEXT } from '../../setupAndRenderMainWidget'
 
 function PageDisplay({
   classes,
@@ -48,27 +48,27 @@ function applyPageBehavior(DisplayComponent) {
     }
 
     downloadFrameImage() {
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'DOWNLOAD_FRAME_IMAGE'
       })
     }
 
     updateFrameDimensions({ nextFrameDimensions }) {
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'UPDATE_FRAME_DIMENSIONS',
         payload: { nextFrameDimensions }
       })
     }
 
     updateFrameSchema({ nextSchemaSource }) {
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'UPDATE_FRAME_SCHEMA',
         payload: { nextSchemaSource }
       })
     }
 
     updateServiceUrl({ nextServiceUrl }) {
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'UPDATE_SERVICE_URL',
         payload: { nextServiceUrl }
       })

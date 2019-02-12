@@ -1,20 +1,34 @@
 import createSagaCore from 'create-saga-core'
 import { spawn, select, call, take, put } from 'redux-saga/effects'
-import UserInterface from './UserInterface'
+import ClientService from './ClientService'
 import CrystalService from './CrystalService'
+
+const CoreAction = {
+  FRAME_DIMENSIONS_UPDATED: 'FRAME_DIMENSIONS_UPDATED',
+  FRAME_LAYER_UPDATED: 'FRAME_LAYER_UPDATED',
+  SERVICE_URL_UPDATED: 'SERVICE_URL_UPDATED'
+}
+
+const ClientMessage = {
+  DOWNLOAD_FRAME_IMAGE: 'DOWNLOAD_FRAME_IMAGE',
+  UPDATE_FRAME_DIMENSIONS: 'UPDATE_FRAME_DIMENSIONS',
+  UPDATE_FRAME_LAYER: 'UPDATE_FRAME_LAYER',
+  UPDATE_FRAME_SCHEMA: 'UPDATE_FRAME_SCHEMA',
+  UPDATE_SERVICE_URL: 'UPDATE_SERVICE_URL'
+}
 
 createSagaCore({ reducer, initializer })
 
-function reducer(state = createInitialState(), action) {
-  switch (action.type) {
-    case 'FRAME_DIMENSIONS_UPDATED':
-      return handleFrameDimensionsUpdated(state, action.payload)
-    case 'FRAME_LAYER_UPDATED':
-      return handleFrameLayerUpdated(state, action.payload)
-    case 'SERVICE_URL_UPDATED':
-      return handleServiceUrlUpdated(state, action.payload)
+function reducer(coreState = createInitialState(), coreAction) {
+  switch (coreAction.type) {
+    case CoreAction.FRAME_DIMENSIONS_UPDATED:
+      return handleFrameDimensionsUpdated(coreState, coreAction.payload)
+    case CoreAction.FRAME_LAYER_UPDATED:
+      return handleFrameLayerUpdated(coreState, coreAction.payload)
+    case CoreAction.SERVICE_URL_UPDATED:
+      return handleServiceUrlUpdated(coreState, coreAction.payload)
     default:
-      return state
+      return coreState
   }
 }
 
@@ -29,69 +43,67 @@ function createInitialState() {
   }
 }
 
-function handleFrameDimensionsUpdated(state, { frameDimensions }) {
-  return { ...state, frameDimensions }
+function handleFrameDimensionsUpdated(coreState, { frameDimensions }) {
+  return { ...coreState, frameDimensions }
 }
 
-function handleFrameLayerUpdated(state, { layerIndex, frameLayer }) {
-  const frameLayers = state.frameLayers.slice()
+function handleFrameLayerUpdated(coreState, { layerIndex, frameLayer }) {
+  const frameLayers = coreState.frameLayers.slice()
   if (frameLayer) {
     frameLayers.splice(layerIndex, 1, frameLayer)
   } else {
     frameLayers.splice(layerIndex, 1)
   }
-  return { ...state, frameLayers }
+  return { ...coreState, frameLayers }
 }
 
-function handleServiceUrlUpdated(state, { serviceUrl }) {
-  return { ...state, serviceUrl }
+function handleServiceUrlUpdated(coreState, { serviceUrl }) {
+  return { ...coreState, serviceUrl }
 }
 
 function* initializer() {
-  yield spawn(userInputProcessor)
+  yield spawn(clientProcessor)
   yield spawn(mainWidgetHydrator)
   yield spawn(imageViewerHydrator)
 }
 
-function* userInputProcessor() {
+function* clientProcessor() {
   const initialCoreState = yield select()
-  const { userInputChannel } = yield call(
-    UserInterface.launch,
+  const { clientMessageChannel } = yield call(
+    ClientService.launch,
     initialCoreState
   )
   while (true) {
-    const userInputMessage = yield take(userInputChannel)
-    switch (userInputMessage.type) {
-      case 'DOWNLOAD_FRAME_IMAGE':
+    const clientMessage = yield take(clientMessageChannel)
+    switch (clientMessage.type) {
+      case ClientMessage.DOWNLOAD_FRAME_IMAGE:
         yield call(handleDownloadFrameImage)
         continue
-      case 'UPDATE_FRAME_DIMENSIONS':
-        yield call(handleUpdateFrameDimensions, userInputMessage.payload)
+      case ClientMessage.UPDATE_FRAME_DIMENSIONS:
+        yield call(handleUpdateFrameDimensions, clientMessage.payload)
         continue
-      case 'UPDATE_FRAME_LAYER':
-        yield call(handleUpdateFrameLayer, userInputMessage.payload)
+      case ClientMessage.UPDATE_FRAME_LAYER:
+        yield call(handleUpdateFrameLayer, clientMessage.payload)
         continue
-      case 'UPDATE_FRAME_SCHEMA':
-        yield call(handleUpdateFrameSchema, userInputMessage.payload)
+      case ClientMessage.UPDATE_FRAME_SCHEMA:
+        yield call(handleUpdateFrameSchema, clientMessage.payload)
         continue
-      case 'UPDATE_SERVICE_URL':
-        yield call(handleUpdateServiceUrl, userInputMessage.payload)
+      case ClientMessage.UPDATE_SERVICE_URL:
+        yield call(handleUpdateServiceUrl, clientMessage.payload)
         continue
       default:
-        throw Error(
-          `Unrecognized user input message type: ${userInputMessage.type}`
-        )
+        throw Error(`Unrecognized client message: ${clientMessage.type}`)
     }
   }
 }
 
 function* handleDownloadFrameImage() {
   try {
-    const { serviceUrl, frameDimensions, frameLayers } = yield select()
-    yield call(UserInterface.downloadFrameImage, {
-      serviceUrl,
+    const { frameDimensions, frameLayers, serviceUrl } = yield select()
+    yield call(ClientService.downloadFrameImage, {
       frameDimensions,
-      frameLayers
+      frameLayers,
+      serviceUrl
     })
   } catch {
     // handle error
@@ -100,7 +112,7 @@ function* handleDownloadFrameImage() {
 
 function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
   yield put({
-    type: 'FRAME_DIMENSIONS_UPDATED',
+    type: CoreAction.FRAME_DIMENSIONS_UPDATED,
     payload: {
       frameDimensions: nextFrameDimensions
     }
@@ -109,7 +121,7 @@ function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
 
 function* handleUpdateFrameLayer({ nextLayer, nextIndex }) {
   yield put({
-    type: 'FRAME_LAYER_UPDATED',
+    type: CoreAction.FRAME_LAYER_UPDATED,
     payload: {
       frameLayer: nextLayer,
       layerIndex: nextIndex
@@ -131,7 +143,7 @@ function* handleUpdateFrameSchema({ nextSchemaSource }) {
 
 function* handleUpdateServiceUrl({ nextServiceUrl }) {
   yield put({
-    type: 'SERVICE_URL_UPDATED',
+    type: CoreAction.SERVICE_URL_UPDATED,
     payload: {
       serviceUrl: nextServiceUrl
     }
@@ -140,25 +152,22 @@ function* handleUpdateServiceUrl({ nextServiceUrl }) {
 
 function* mainWidgetHydrator() {
   while (true) {
-    yield take([
-      'FRAME_DIMENSIONS_UPDATED',
-      'FRAME_LAYER_UPDATED',
-      'SERVICE_URL_UPDATED'
-    ])
+    const allCoreActions = Object.keys(CoreAction)
+    yield take(allCoreActions)
     const coreState = yield select()
-    yield call(UserInterface.hydrateMainWidget, coreState)
+    yield call(ClientService.hydrateMainWidget, coreState)
   }
 }
 
 function* imageViewerHydrator() {
   while (true) {
-    yield take(['FRAME_LAYER_UPDATED'])
+    yield take([CoreAction.FRAME_LAYER_UPDATED])
     try {
-      const { serviceUrl, frameDimensions, frameLayers } = yield select()
-      yield call(UserInterface.hydrateImageViewer, {
-        serviceUrl,
+      const { frameDimensions, frameLayers, serviceUrl } = yield select()
+      yield call(ClientService.hydrateImageViewer, {
         frameDimensions,
-        frameLayers
+        frameLayers,
+        serviceUrl
       })
     } catch {
       // handle error

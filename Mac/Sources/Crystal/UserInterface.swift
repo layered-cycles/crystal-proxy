@@ -43,11 +43,11 @@ final class UserInterface {
     vapor.asyncRun()
   }
 
-  func _hydrateMainWidget(widgetState: String) {
+  func _postMainMessage(mainMessageString: String) {
     mainWindowController
       .viewController
       .webSocket
-      .send(widgetState)
+      .send(mainMessageString)
   }
 
   func _hydrateImageViewer(
@@ -100,14 +100,14 @@ final class UserInterface {
 
 extension UserInterface: StatefulCoreService {
   var namespace: String {
-    return "_UserInterface"
+    return "_ClientService"
   }
 
   var api: Core.Service.Api {
     return [
       "launch": launch,
       "launchImageViewer": launchImageViewer,
-      "hydrateMainWidget": hydrateMainWidget,
+      "postMainMessage": postMainMessage,
       "hydrateImageViewer": hydrateImageViewer,
       "downloadFrameImage": downloadFrameImage
     ]
@@ -121,8 +121,8 @@ extension UserInterface: StatefulCoreService {
     return self._launchImageViewer
   }
 
-  var hydrateMainWidget: @convention(block) (String) -> () {
-    return self._hydrateMainWidget
+  var postMainMessage: @convention(block) (String) -> () {
+    return self._postMainMessage
   }
 
   var hydrateImageViewer: @convention(block) (String, [String: Double], [AnyObject]) -> () {

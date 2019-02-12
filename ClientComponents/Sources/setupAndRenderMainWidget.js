@@ -17,32 +17,34 @@ const CRYSTAL_THEME = createMuiTheme({
 
 const WIDGET_CONTEXT = React.createContext()
 
-function setupAndRenderWidget(Widget) {
+function setupAndRenderMainWidget(MainWidget) {
   class Instance extends React.Component {
     state = {
-      postUserMessage: null,
-      widgetState: Widget.getDefaultState()
+      postCoreMessage: null,
+      widgetState: MainWidget.getDefaultState()
     }
 
     componentDidMount() {
       const webSocket = new WebSocket(`ws://localhost:3001/io`)
-      const postUserMessage = userMessage => {
-        const messageString = JSON.stringify(userMessage)
-        webSocket.send(messageString)
+      const postCoreMessage = clientMessage => {
+        const clientMessageString = JSON.stringify(clientMessage)
+        webSocket.send(clientMessageString)
       }
       webSocket.addEventListener('open', () => {
-        postUserMessage({
-          type: 'SETUP_WIDGET',
+        postCoreMessage({
+          type: 'SETUP_MAIN_WIDGET',
           payload: {
-            selectWidgetState: `${Widget.selectWidgetState}`
+            selectState: `${MainWidget.selectState}`
           }
         })
         webSocket.addEventListener('message', messageEvent => {
-          const userInterfaceMessage = JSON.parse(messageEvent.data)
-          switch (userInterfaceMessage.type) {
-            case 'HYDRATE_WIDGET':
-              const { widgetState } = userInterfaceMessage.payload
-              this.setState({ widgetState })
+          const coreMessage = JSON.parse(messageEvent.data)
+          switch (coreMessage.type) {
+            case 'HYDRATE_MAIN_WIDGET':
+              const { nextMainState } = coreMessage.payload
+              this.setState({
+                widgetState: nextMainState
+              })
               return
           }
         })
@@ -55,23 +57,23 @@ function setupAndRenderWidget(Widget) {
           document.body.style.backgroundColor = 'rgb(246,246,246)'
           document.getElementById('WIDGET_CONTAINER').style.visibility =
             'visible'
-          postUserMessage({
+          postCoreMessage({
             type: 'LAUNCH_IMAGE_VIEWER'
           })
         })
-      this.setState({ postUserMessage })
+      this.setState({ postCoreMessage })
     }
 
     render() {
       return (
         <WIDGET_CONTEXT.Provider
           value={{
-            postUserMessage: this.state.postUserMessage
+            postCoreMessage: this.state.postCoreMessage
           }}
           key="widget-context-provider"
         >
           <MuiThemeProvider theme={CRYSTAL_THEME}>
-            <Widget {...this.state.widgetState} />
+            <MainWidget {...this.state.widgetState} />
           </MuiThemeProvider>
         </WIDGET_CONTEXT.Provider>
       )
@@ -84,5 +86,5 @@ function setupAndRenderWidget(Widget) {
   ReactDOM.render(widgetElement, widgetContainer)
 }
 
-export default setupAndRenderWidget
+export default setupAndRenderMainWidget
 export { WIDGET_CONTEXT }

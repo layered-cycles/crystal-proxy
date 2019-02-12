@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import BackoutChangesIcon from '@material-ui/icons/ArrowBackIosRounded'
 import ForwardChangesIcon from '@material-ui/icons/ArrowForwardIosRounded'
 import { withStyles } from '@material-ui/core/styles'
-import { WIDGET_CONTEXT } from '../../setupAndRenderWidget'
+import { WIDGET_CONTEXT } from '../../setupAndRenderMainWidget.js'
 
 function DialogDisplay({
   layerIsNotNew,
@@ -105,7 +105,7 @@ function applyDialogBehavior(DisplayComponent) {
       this.setState({
         open: false
       })
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'UPDATE_FRAME_LAYER',
         payload: {
           nextIndex: this.props.focusedLayer.index,
@@ -118,7 +118,7 @@ function applyDialogBehavior(DisplayComponent) {
       this.setState({
         open: false
       })
-      this.context.postUserMessage({
+      this.context.postCoreMessage({
         type: 'UPDATE_FRAME_LAYER',
         payload: {
           nextIndex: this.props.focusedLayer.index,
