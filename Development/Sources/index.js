@@ -4,18 +4,18 @@ const { call, spawn, take } = require('redux-saga/effects')
 const { eventChannel, buffers } = require('redux-saga')
 const createFileWatcher = require('node-watch')
 const createBundler = require('webpack')
-const coreWebpackConfig = require('../core.webpack.config')
-const widgetsWebpackConfig = require('../widgets.webpack.config')
+const proxyCoreWebpackConfig = require('../proxycore.webpack.config')
+const clientComponentsWebpackConfig = require('../clientcomponents.webpack.config')
 
 createSagaCore({ initializer })
 
 function* initializer() {
   yield call(makeStageDirectory)
   yield call(copyAppIconToStage)
-  yield call(updateMacExecutable)
-  yield spawn(macExecutableProcessor)
-  yield spawn(coreBundleProcessor)
-  yield spawn(widgetsBundleProcessor)
+  yield call(updateExecutable)
+  yield spawn(executableProcessor)
+  yield spawn(coreScriptProcessor)
+  yield spawn(clientComponentsProcessor)
 }
 
 function makeStageDirectory() {
@@ -40,19 +40,21 @@ function copyAppIconToStage() {
   })
 }
 
-function* updateMacExecutable() {
-  yield call(buildMacExecutable)
-  yield call(copyMacExecutableToStage)
-  yield call(restartMacExecutable)
+function* updateExecutable() {
+  yield call(buildExecutable)
+  yield call(copyExecutableToStage)
+  yield call(restartExecutable)
 }
 
-function buildMacExecutable() {
+function buildExecutable() {
   return new Promise(resolve => {
-    console.log('building mac executable...')
+    console.log('building executable...')
     const buildProcess = Child.spawn(
       'swift',
       ['build', '--package-path', '../App'],
-      { stdio: 'inherit' }
+      {
+        stdio: 'inherit'
+      }
     )
     buildProcess.on('close', () => {
       console.log('')
@@ -61,9 +63,9 @@ function buildMacExecutable() {
   })
 }
 
-function copyMacExecutableToStage() {
+function copyExecutableToStage() {
   return new Promise(resolve => {
-    console.log('copying mac executable to stage...')
+    console.log('copying executable to stage...')
     console.log('')
     Child.exec(
       'cp ../App/.build/x86_64-apple-macosx10.10/debug/Crystal ./Stage',
@@ -75,22 +77,22 @@ function copyMacExecutableToStage() {
   })
 }
 
-function* restartMacExecutable() {
-  yield call(killMacExecutable)
-  yield call(runMacExecutable)
+function* restartExecutable() {
+  yield call(killExecutable)
+  yield call(runExecutable)
 }
 
-function killMacExecutable() {
+function killExecutable() {
   return new Promise(resolve => {
-    console.log('killing mac executable...')
+    console.log('killing executable...')
     console.log('')
     Child.exec('pkill -f Crystal', () => resolve())
   })
 }
 
-function runMacExecutable() {
+function runExecutable() {
   return new Promise(resolve => {
-    console.log('running mac executable...')
+    console.log('running executable...')
     console.log('')
     Child.spawn('./Crystal', [], {
       cwd: './Stage',
@@ -100,19 +102,19 @@ function runMacExecutable() {
   })
 }
 
-function* macExecutableProcessor() {
-  const { watcherChannel } = yield call(startExecutableSourceWatcher)
+function* executableProcessor() {
+  const { executableWatcherChannel } = yield call(startExecutableWatcher)
   while (true) {
-    yield take(watcherChannel)
-    yield call(updateMacExecutable)
+    yield take(executableWatcherChannel)
+    yield call(updateExecutable)
   }
 }
 
-function startExecutableSourceWatcher() {
+function startExecutableWatcher() {
   return new Promise(resolve => {
-    console.log('starting executable source watcher...')
+    console.log('starting executable watcher...')
     console.log('')
-    const watcherChannel = eventChannel(emitMessage => {
+    const executableWatcherChannel = eventChannel(emitMessage => {
       createFileWatcher(
         ['../App/Sources'],
         {
@@ -120,77 +122,77 @@ function startExecutableSourceWatcher() {
         },
         () =>
           emitMessage({
-            type: 'EXECUTABLE_SOURCE_CHANGED'
+            type: 'EXECUTABLE_CHANGED'
           })
       )
       return () => null
     }, buffers.expanding())
-    resolve({ watcherChannel })
+    resolve({ executableWatcherChannel })
   })
 }
 
-function* coreBundleProcessor() {
-  const { bundlerChannel } = yield call(startCoreBundler)
+function* coreScriptProcessor() {
+  const { coreBundlerChannel } = yield call(startCoreBundler)
   while (true) {
-    yield take(bundlerChannel)
-    yield call(restartMacExecutable)
+    yield take(coreBundlerChannel)
+    yield call(restartExecutable)
   }
 }
 
 function startCoreBundler() {
   return new Promise(resolve => {
-    console.log('starting core bundler...')
+    console.log('starting core script bundler...')
     console.log('')
-    const bundlerChannel = eventChannel(emitMessage => {
-      const bundler = createBundler(coreWebpackConfig)
+    const coreBundlerChannel = eventChannel(emitMessage => {
+      const bundler = createBundler(proxyCoreWebpackConfig)
       bundler.watch({}, (watchError, watchStats) => {
         if (watchError) throw watchError
         const formattedWatchStats = watchStats.toString({
           chunks: false,
           colors: true
         })
-        console.log('core bundle updated...')
+        console.log('core script updated...')
         console.log(formattedWatchStats)
         console.log('')
         emitMessage({
-          type: 'CLIENT_CORE_BUNDLE_UPDATED'
+          type: 'CORE_SCRIPT_UPDATED'
         })
       })
       return () => null
     }, buffers.expanding())
-    resolve({ bundlerChannel })
+    resolve({ coreBundlerChannel })
   })
 }
 
-function* widgetsBundleProcessor() {
-  const { widgetsBundlerChannel } = yield call(startWidgetsBundler)
+function* clientComponentsProcessor() {
+  const { clientBundlerChannel } = yield call(startClientBundler)
   while (true) {
-    yield take(widgetsBundlerChannel)
-    yield call(restartMacExecutable)
+    yield take(clientBundlerChannel)
+    yield call(restartExecutable)
   }
 }
 
-function startWidgetsBundler() {
+function startClientBundler() {
   return new Promise(resolve => {
-    console.log('starting widgets bundler...')
+    console.log('starting client components bundler...')
     console.log('')
-    const widgetsBundlerChannel = eventChannel(emitMessage => {
-      const bundler = createBundler(widgetsWebpackConfig)
+    const clientBundlerChannel = eventChannel(emitMessage => {
+      const bundler = createBundler(clientComponentsWebpackConfig)
       bundler.watch({}, (watchError, watchStats) => {
         if (watchError) throw watchError
         const formattedWatchStats = watchStats.toString({
           chunks: false,
           colors: true
         })
-        console.log('widgets output updated...')
+        console.log('client components updated...')
         console.log(formattedWatchStats)
         console.log('')
         emitMessage({
-          type: 'WIDGETS_OUTPUT_UPDATED'
+          type: 'CLIENT_COMPONENTS_UPDATED'
         })
       })
       return () => null
     }, buffers.expanding())
-    resolve({ widgetsBundlerChannel })
+    resolve({ clientBundlerChannel })
   })
 }
