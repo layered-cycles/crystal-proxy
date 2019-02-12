@@ -1,5 +1,6 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography'
+import Divider from '@material-ui/core/Divider'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemAvatar from '@material-ui/core/ListItemAvatar'
@@ -8,27 +9,41 @@ import ListItemText from '@material-ui/core/ListItemText'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import IconButton from '@material-ui/core/IconButton'
 import FocusIcon from '@material-ui/icons/VisibilityRounded'
-import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 
-function ListDisplay({ _layerItems, classes }) {
-  if (!_layerItems.length) {
+function ListDisplay({ frameLayers, classes, focusLayer }) {
+  if (!frameLayers.length) {
     return (
       <div className={classes.emptyListContainer}>
         <Typography className={classes.emptyLabelFont}>No Layers</Typography>
       </div>
     )
   }
+  const layerItems = frameLayers.map((frameLayer, layerIndex) => {
+    const layerIsNotLast = layerIndex !== frameLayers.length - 1
+    const maybeDividerElement = layerIsNotLast ? (
+      <Divider key={`divider-${layerIndex}`} variant="inset" />
+    ) : null
+    return [
+      <ItemDisplayWithStyles
+        key={`item-${layerIndex}`}
+        focusLayer={focusLayer}
+        _frameLayer={frameLayer}
+        _layerIndex={layerIndex}
+      />,
+      maybeDividerElement
+    ]
+  })
   return (
     <div className={classes.listContainer}>
-      <List>{_layerItems}</List>
+      <List>{layerItems}</List>
     </div>
   )
 }
 
 function ItemDisplay({ _layerIndex, classes, _frameLayer, focusLayer }) {
   return (
-    <ListItem key={_layerIndex}>
+    <ListItem>
       <ListItemAvatar>
         <Avatar className={classes.layerIndex}>{_layerIndex}</Avatar>
       </ListItemAvatar>
@@ -53,32 +68,6 @@ function ItemDisplay({ _layerIndex, classes, _frameLayer, focusLayer }) {
   )
 }
 
-function applyListBehavior(DisplayComponent) {
-  class Instance extends React.Component {
-    render() {
-      const layerItems = this.props.frameLayers.map(
-        (frameLayer, layerIndex) => {
-          const layerIsNotLast =
-            layerIndex !== this.props.frameLayers.length - 1
-          const maybeDividerElement = layerIsNotLast ? (
-            <Divider key={`divider-${layerIndex}`} variant="inset" />
-          ) : null
-          return [
-            <ItemDisplayWithStyles
-              focusLayer={this.props.focusLayer}
-              _frameLayer={frameLayer}
-              _layerIndex={layerIndex}
-            />,
-            maybeDividerElement
-          ]
-        }
-      )
-      return <DisplayComponent _layerItems={layerItems} />
-    }
-  }
-  return Instance
-}
-
 const ItemDisplayWithStyles = withStyles(theme => ({
   focusIcon: {
     color: theme.palette.primary.main
@@ -94,7 +83,7 @@ const ItemDisplayWithStyles = withStyles(theme => ({
     fontSize: '16px'
   }
 }))(ItemDisplay)
-const ListDisplayWithStyles = withStyles({
+export default withStyles({
   emptyLabelFont: {
     fontSize: '16px',
     fontFamily: 'Roboto',
@@ -112,4 +101,3 @@ const ListDisplayWithStyles = withStyles({
     overflow: 'scroll'
   }
 })(ListDisplay)
-export default applyListBehavior(ListDisplayWithStyles)
