@@ -57,7 +57,8 @@ final class ClientService {
       frameLayers: frameLayers) {
         nextImageData in        
         if nextImageData.isEmpty || frameLayers.count == 0 {
-          self.windowController.displayNoImage()
+          self.windowController.displayNoImage(
+            frameDimensions: frameDimensions)
           return 
         }
         self.windowController.displayImage(
@@ -216,12 +217,24 @@ final class WindowController: NSWindowController {
     self.imageController.imageView.frame = self.imageController.view.frame
   }
 
-  func displayNoImage() {
+  func displayNoImage(
+    frameDimensions: [String: Double]) 
+  {
     if self.imageController.view.subviews[0] != self.imageController.webView {
       self.imageController.imageView.removeFromSuperview()      
       self.imageController.view.addSubview(self.imageController.webView)
       self.imageController.webView.frame = self.imageController.view.frame
     }
+    let imageWindow = self.window!.childWindows![0]
+    let staleWindowFrame = imageWindow.frame
+    let viewFrameSize = NSSize(
+      width: frameDimensions["width"]!,
+      height: frameDimensions["height"]!)     
+    imageWindow.setContentSize(viewFrameSize)
+    let imageWindowAnchor = NSPoint(
+      x: staleWindowFrame.minX,
+      y: staleWindowFrame.maxY)
+    imageWindow.setFrameTopLeftPoint(imageWindowAnchor)
   }
 
   required init?(
