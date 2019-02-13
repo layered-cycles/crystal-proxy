@@ -1,5 +1,7 @@
 import React from 'react'
-import setupAndRenderMainWidget from '../setupAndRenderMainWidget.js'
+import setupAndRenderMainWidget, {
+  WIDGET_CONTEXT
+} from '../setupAndRenderMainWidget.js'
 import LayersPage from './LayersPage/index.js'
 import MetaPage from './MetaPage/index.js'
 
@@ -37,6 +39,8 @@ function MainDisplay({
 
 function applyMainBehavior(DisplayComponent) {
   class Instance extends React.Component {
+    static contextType = WIDGET_CONTEXT
+
     state = {
       displayMode: DisplayMode.LAYERS
     }
@@ -63,6 +67,9 @@ function applyMainBehavior(DisplayComponent) {
     leaveMetaPage() {
       this.setState({
         displayMode: DisplayMode.LAYERS
+      })
+      this.context.postCoreMessage({
+        type: 'REFRESH_FRAME_IMAGE'
       })
     }
   }

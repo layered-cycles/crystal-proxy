@@ -6,11 +6,13 @@ import CrystalService from './CrystalService'
 const CoreAction = {
   FRAME_DIMENSIONS_UPDATED: 'FRAME_DIMENSIONS_UPDATED',
   FRAME_LAYER_UPDATED: 'FRAME_LAYER_UPDATED',
+  REFRESH_FRAME_IMAGE: 'REFRESH_FRAME_IMAGE',
   SERVICE_URL_UPDATED: 'SERVICE_URL_UPDATED'
 }
 
 const ClientMessage = {
   DOWNLOAD_FRAME_IMAGE: 'DOWNLOAD_FRAME_IMAGE',
+  REFRESH_FRAME_IMAGE: 'REFRESH_FRAME_IMAGE',
   UPDATE_FRAME_DIMENSIONS: 'UPDATE_FRAME_DIMENSIONS',
   UPDATE_FRAME_LAYER: 'UPDATE_FRAME_LAYER',
   UPDATE_FRAME_SCHEMA: 'UPDATE_FRAME_SCHEMA',
@@ -79,6 +81,9 @@ function* clientProcessor() {
       case ClientMessage.DOWNLOAD_FRAME_IMAGE:
         yield call(handleDownloadFrameImage)
         continue
+      case ClientMessage.REFRESH_FRAME_IMAGE:
+        yield call(handleRefreshFrameImage)
+        continue
       case ClientMessage.UPDATE_FRAME_DIMENSIONS:
         yield call(handleUpdateFrameDimensions, clientMessage.payload)
         continue
@@ -106,8 +111,14 @@ function* handleDownloadFrameImage() {
       serviceUrl
     })
   } catch {
-    // handle error
+    // todo
   }
+}
+
+function* handleRefreshFrameImage() {
+  yield put({
+    type: CoreAction.REFRESH_FRAME_IMAGE
+  })
 }
 
 function* handleUpdateFrameDimensions({ nextFrameDimensions }) {
@@ -137,7 +148,7 @@ function* handleUpdateFrameSchema({ nextSchemaSource }) {
       schemaSource: nextSchemaSource
     })
   } catch {
-    // handle error
+    // todo
   }
 }
 
@@ -161,7 +172,7 @@ function* mainWidgetHydrator() {
 
 function* frameImageHydrator() {
   while (true) {
-    yield take([CoreAction.FRAME_LAYER_UPDATED])
+    yield take([CoreAction.FRAME_LAYER_UPDATED, CoreAction.REFRESH_FRAME_IMAGE])
     try {
       const { frameDimensions, frameLayers, serviceUrl } = yield select()
       yield call(ClientService.hydrateFrameImage, {
@@ -170,7 +181,7 @@ function* frameImageHydrator() {
         serviceUrl
       })
     } catch {
-      // handle error
+      // todo
     }
   }
 }
