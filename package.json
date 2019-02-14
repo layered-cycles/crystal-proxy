@@ -6,10 +6,12 @@
     "packages": [
       "ClientComponents",
       "Development",
+      "Production",
       "ProxyCore"
     ]
   },
   "scripts": {
+    "build-production": "cd Production && yarn start",
     "start-development": "cd Development && yarn start"
   }
 }

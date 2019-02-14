@@ -1,6 +1,6 @@
  import Cocoa
 
-let ICON_URL = Bundle.main.resourceURL!.appendingPathComponent("CrystalIcon.png")
+let ICON_URL = Bundle.main.resourceURL!.appendingPathComponent("Crystal.png")
 let ICON_IMAGE = NSImage(
   contentsOf: ICON_URL)!
 ICON_IMAGE.setName(NSImage.applicationIconName)
@@ -33,8 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApp.activate(
       ignoringOtherApps: true)    
     NSApplication.shared.applicationIconImage = ICON_IMAGE
-    let coreProxyScriptURL = URL(
-      fileURLWithPath: "./proxy-core.js")
+    let coreProxyScriptURL = Bundle.main.resourceURL!.appendingPathComponent("proxy-core.js")
     let coreProxyScript = try! String(
       contentsOf: coreProxyScriptURL, 
       encoding: .utf8)

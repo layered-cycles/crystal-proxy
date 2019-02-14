@@ -20,9 +20,9 @@ enum CrystalService {
       .response 
     { 
       alamoResponse in
-      let statusCode = alamoResponse.response?.statusCode
+      let maybeStatusCode = alamoResponse.response?.statusCode as Any
       completionHandler.call(
-        withArguments: [statusCode])  
+        withArguments: [maybeStatusCode])  
     }
   }
 

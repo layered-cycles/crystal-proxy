@@ -103,7 +103,7 @@ final class ClientService {
       config: vaporConfig, 
       environment: vaporEnvironment, 
       services: vaporServices)
-    vapor.asyncRun()
+    _ = vapor.asyncRun()
   }
 
   func _postMainMessage(
@@ -253,8 +253,10 @@ final class MainController: NSViewController, WKUIDelegate {
       nibName: nil, 
       bundle: nil)      
     let webConfiguration = WKWebViewConfiguration()
-    webConfiguration.preferences.setValue(true, 
-      forKey: "developerExtrasEnabled")
+    #if DEBUG
+      webConfiguration.preferences.setValue(true, 
+        forKey: "developerExtrasEnabled")
+    #endif
     self.webView = WKWebView(
       frame: .zero, 
       configuration: webConfiguration)      
@@ -266,13 +268,16 @@ final class MainController: NSViewController, WKUIDelegate {
     self.webView.autoresizingMask = NSView.AutoresizingMask(
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
-    let loaderScriptUrl = URL(
-      fileURLWithPath: "./mainloading.display.js")
+    Bundle.main.resourceURL!
+    let loaderScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.loading.js")
+    // URL(
+    //   fileURLWithPath: "./main.loading.js")
     let loaderScript = try! String(
       contentsOf: loaderScriptUrl)
     self.webView.evaluateJavaScript(loaderScript)
-    let widgetScriptUrl = URL(
-      fileURLWithPath: "./main.widget.js")
+    let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.widget.js")
+    // let widgetScriptUrl = URL(
+    //   fileURLWithPath: "./main.widget.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     self.webView.evaluateJavaScript(widgetScript)
@@ -326,8 +331,9 @@ final class ImageController: NSViewController, WKUIDelegate {
     self.webView.autoresizingMask = NSView.AutoresizingMask(
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
-    let widgetScriptUrl = URL(
-      fileURLWithPath: "./noimage.display.js")
+    let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("noimage.display.js")
+    // let widgetScriptUrl = URL(
+    //   fileURLWithPath: "./noimage.display.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     self.webView.evaluateJavaScript(widgetScript)

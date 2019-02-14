@@ -1,7 +1,7 @@
 const Path = require('path')
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     'main.loading': Path.resolve(
       __dirname,
@@ -18,7 +18,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
-    path: Path.resolve(__dirname, './Stage')
+    path: Path.resolve(__dirname, './Stage/Crystal.app/Contents/Resources')
   },
   module: {
     rules: [

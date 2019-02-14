@@ -33,7 +33,7 @@ function copyAppIconToStage() {
   return new Promise(resolve => {
     console.log('copying app icon to stage...')
     console.log('')
-    Child.exec('cp ../App/CrystalIcon.png ./Stage', copyError => {
+    Child.exec('cp ../App/Crystal.png ./Stage', copyError => {
       if (copyError) throw copyError
       resolve()
     })
