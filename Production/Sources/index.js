@@ -17,7 +17,6 @@ function* initializer() {
   yield call(buildExecutable)
   yield call(copyExecutableToStage)
   yield call(updateExecutableDylibPaths)
-  // yield call(setExecutableIcon)
   yield call(encodeExecutable)
   yield call(copyEncodedExecutableToResources)
   yield call(bundleProxyCore)
@@ -84,7 +83,9 @@ function buildExecutable() {
         '../App',
         '--configuration',
         'release',
-        '--static-swift-stdlib'
+        '--static-swift-stdlib',
+        '-Xswiftc',
+        '-DRELEASE'
       ],
       {
         stdio: 'inherit'
@@ -157,20 +158,6 @@ function copyEncodedExecutableToResources() {
       'cp ./Stage/Crystal64 ./Stage/Crystal.app/Contents/Resources',
       copyError => {
         if (copyError) throw copyError
-        resolve()
-      }
-    )
-  })
-}
-
-function setExecutableIcon() {
-  return new Promise(resolve => {
-    console.log('setting executable icon...')
-    console.log('')
-    Child.exec(
-      'yarn fileicon set ./Stage/Crystal ./Stage/Crystal.app/Contents/Resources/Crystal.png',
-      setError => {
-        if (setError) throw setError
         resolve()
       }
     )

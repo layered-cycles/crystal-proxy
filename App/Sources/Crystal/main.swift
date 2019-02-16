@@ -1,12 +1,15 @@
 import Cocoa
 
 // app icon workaround
-let iconFilePath = Bundle.main.resourceURL!.appendingPathComponent("applet.icns").path
-let iconImage = NSImage(
-  contentsOfFile: iconFilePath)
-let executableFilePath = Bundle.main.resourceURL!.appendingPathComponent("Crystal").path
-NSWorkspace.shared.setIcon(iconImage,
-  forFile: )
+// todo - put in python launch script
+#if RELEASE 
+  let iconFilePath = Bundle.main.resourceURL!.appendingPathComponent("applet.icns").path
+  let iconImage = NSImage(
+    contentsOfFile: iconFilePath)
+  let executableFilePath = Bundle.main.resourceURL!.appendingPathComponent("Crystal").path
+  NSWorkspace.shared.setIcon(iconImage,
+    forFile: executableFilePath)
+#endif
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   let clientService = ClientService()
