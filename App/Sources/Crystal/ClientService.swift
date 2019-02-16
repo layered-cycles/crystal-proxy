@@ -153,11 +153,11 @@ final class WindowController: NSWindowController {
   let imageController = ImageController()
   let mainController = MainController()  
 
-  init() {
+  init() {    
     let mainWindow = NSWindow(
       contentViewController: self.mainController)
     mainWindow.animationBehavior = .documentWindow
-    mainWindow.backgroundColor = LIGHT_WHITE     
+    mainWindow.backgroundColor = PRIMARY_GREY     
     mainWindow.title = ""
     let rawWindowStyleValue = 
       NSWindow.StyleMask.titled.rawValue |
@@ -173,7 +173,7 @@ final class WindowController: NSWindowController {
         y: NSScreen.main!.frame.height - 32)
     mainWindow.setFrameTopLeftPoint(mainWindowAnchor)
     super.init(
-      window: mainWindow)         
+      window: mainWindow)        
   }
 
   func launchImageWindow() {    
@@ -251,33 +251,26 @@ final class MainController: NSViewController, WKUIDelegate {
   init() {
     super.init(
       nibName: nil, 
-      bundle: nil)      
+      bundle: nil)    
     let webConfiguration = WKWebViewConfiguration()
-    #if DEBUG
-      webConfiguration.preferences.setValue(true, 
-        forKey: "developerExtrasEnabled")
-    #endif
+    webConfiguration.preferences.setValue(true, 
+      forKey: "developerExtrasEnabled")
     self.webView = WKWebView(
       frame: .zero, 
       configuration: webConfiguration)      
     self.webView.set(
-      backgroundColor: LIGHT_WHITE)
+      backgroundColor: PRIMARY_GREY)
     let rawViewResizingValue = 
       NSView.AutoresizingMask.width.rawValue | 
       NSView.AutoresizingMask.height.rawValue
     self.webView.autoresizingMask = NSView.AutoresizingMask(
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
-    Bundle.main.resourceURL!
     let loaderScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.loading.js")
-    // URL(
-    //   fileURLWithPath: "./main.loading.js")
     let loaderScript = try! String(
       contentsOf: loaderScriptUrl)
     self.webView.evaluateJavaScript(loaderScript)
     let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.widget.js")
-    // let widgetScriptUrl = URL(
-    //   fileURLWithPath: "./main.widget.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     self.webView.evaluateJavaScript(widgetScript)
@@ -332,8 +325,6 @@ final class ImageController: NSViewController, WKUIDelegate {
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
     let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("noimage.display.js")
-    // let widgetScriptUrl = URL(
-    //   fileURLWithPath: "./noimage.display.js")
     let widgetScript = try! String(
       contentsOf: widgetScriptUrl)
     self.webView.evaluateJavaScript(widgetScript)

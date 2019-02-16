@@ -1,9 +1,12 @@
- import Cocoa
+import Cocoa
 
-let ICON_URL = Bundle.main.resourceURL!.appendingPathComponent("Crystal.png")
-let ICON_IMAGE = NSImage(
-  contentsOf: ICON_URL)!
-ICON_IMAGE.setName(NSImage.applicationIconName)
+// app icon workaround
+let iconFilePath = Bundle.main.resourceURL!.appendingPathComponent("applet.icns").path
+let iconImage = NSImage(
+  contentsOfFile: iconFilePath)
+let executableFilePath = Bundle.main.resourceURL!.appendingPathComponent("Crystal").path
+NSWorkspace.shared.setIcon(iconImage,
+  forFile: )
 
 class AppDelegate: NSObject, NSApplicationDelegate {
   let clientService = ClientService()
@@ -32,7 +35,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     NSApp.setActivationPolicy(.regular)
     NSApp.activate(
       ignoringOtherApps: true)    
-    NSApplication.shared.applicationIconImage = ICON_IMAGE
     let coreProxyScriptURL = Bundle.main.resourceURL!.appendingPathComponent("proxy-core.js")
     let coreProxyScript = try! String(
       contentsOf: coreProxyScriptURL, 
@@ -44,15 +46,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.clientService.javaScriptService,
         CrystalService.javaScriptService
       ])    
-    self.clientService.windowController.showWindow(nil)    
+    self.clientService.windowController.showWindow(nil)
   }
 
   @objc func displayAboutPanel() {
     if #available(macOS 10.13, *) {      
       NSApplication.shared.orderFrontStandardAboutPanel(
         options: [
-          NSApplication.AboutPanelOptionKey.applicationIcon: ICON_IMAGE,
-          NSApplication.AboutPanelOptionKey.applicationVersion: "Version 0.1.0"
+          NSApplication.AboutPanelOptionKey.applicationIcon: NSRunningApplication.current.icon!,
+          NSApplication.AboutPanelOptionKey.applicationVersion: "0.1.0"
         ])
     }
   }
