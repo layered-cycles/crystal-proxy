@@ -5,8 +5,6 @@ const bundleWebpack = require('webpack')
 const proxyCoreWebpackConfig = require('../proxycore.webpack.js')
 const clientComponentsWebpackConfig = require('../clientcomponents.webpack.js')
 
-const DISTRIBUTE = process.argv[2] === '--distribute'
-
 createSagaCore({ initializer })
 
 function* initializer() {
@@ -15,16 +13,10 @@ function* initializer() {
   yield call(copyBundleTemplate)
   yield call(cleanAppPackage)
   yield call(buildExecutable)
-  yield call(copyExecutableToStage)
+  yield call(copyExecutableToBundle)
   yield call(updateExecutableDylibPaths)
-  yield call(encodeExecutable)
-  yield call(copyEncodedExecutableToResources)
   yield call(bundleProxyCore)
   yield call(bundleClientComponents)
-  if (DISTRIBUTE) {
-    yield call(signAppBundle)
-    yield call(createDMG)
-  }
 }
 
 function removeStaleStage() {
@@ -53,7 +45,7 @@ function copyBundleTemplate() {
   return new Promise(resolve => {
     console.log('copying bundle template...')
     console.log('')
-    Child.exec('cp -R CrystalTemplate.app ./Stage/Crystal.app', copyError => {
+    Child.exec('cp -R Template.app ./Stage/Crystal.app', copyError => {
       if (copyError) throw copyError
       resolve()
     })
@@ -98,12 +90,12 @@ function buildExecutable() {
   })
 }
 
-function copyExecutableToStage() {
+function copyExecutableToBundle() {
   return new Promise(resolve => {
     console.log('copying executable to stage...')
     console.log('')
     Child.exec(
-      'cp ../App/.build/x86_64-apple-macosx10.10/release/Crystal ./Stage',
+      'cp ../App/.build/x86_64-apple-macosx10.10/release/Crystal ./Stage/Crystal.app/Contents/MacOS',
       copyError => {
         if (copyError) throw copyError
         resolve()
@@ -128,36 +120,9 @@ function* updateExecutableDylibPaths() {
 function updateDylibPath(previousPath, newPath) {
   return new Promise(resolve => {
     Child.exec(
-      `install_name_tool -change ${previousPath} ${newPath} ./Stage/Crystal`,
+      `install_name_tool -change ${previousPath} ${newPath} ./Stage/Crystal.app/Contents/MacOS/Crystal`,
       updateError => {
         if (updateError) throw updateError
-        resolve()
-      }
-    )
-  })
-}
-
-function encodeExecutable() {
-  console.log('encoding executable...')
-  return new Promise(resolve => {
-    Child.exec(
-      'openssl base64 -in ./Stage/Crystal -out ./Stage/Crystal64',
-      encodingError => {
-        if (encodingError) throw encodingError
-        resolve()
-      }
-    )
-  })
-}
-
-function copyEncodedExecutableToResources() {
-  return new Promise(resolve => {
-    console.log('copying encoded executable to resources...')
-    console.log('')
-    Child.exec(
-      'cp ./Stage/Crystal64 ./Stage/Crystal.app/Contents/Resources',
-      copyError => {
-        if (copyError) throw copyError
         resolve()
       }
     )
@@ -190,47 +155,6 @@ function bundleClientComponents() {
         colors: true
       })
       console.log(formattedWatchStats)
-      console.log('')
-      resolve()
-    })
-  })
-}
-
-function signAppBundle() {
-  return new Promise(resolve => {
-    console.log('signing app bundle...')
-    Child.execSync('xattr -cr ./Stage/Crystal.app/')
-    const createProcess = Child.spawn(
-      'codesign',
-      [
-        '--force',
-        '--deep',
-        '--sign',
-        'Developer ID Application: Jared Mathews',
-        './Stage/Crystal.app'
-      ],
-      {
-        stdio: 'inherit'
-      }
-    )
-    createProcess.on('close', () => {
-      console.log('')
-      resolve()
-    })
-  })
-}
-
-function createDMG() {
-  return new Promise(resolve => {
-    console.log('creating dmg...')
-    const createProcess = Child.spawn(
-      'yarn',
-      ['create-dmg', './Stage/Crystal.app', './Stage'],
-      {
-        stdio: 'inherit'
-      }
-    )
-    createProcess.on('close', () => {
       console.log('')
       resolve()
     })

@@ -1,3 +1,5 @@
+ import Foundation 
+ 
  enum ConsoleService: FixedCoreService {
   static let namespace = "_Console"
   
@@ -6,6 +8,6 @@
   ]
   
   static let log: @convention(block) (String) -> Void = { 
-    print($0) 
+    NSLog("\($0)")
   }
  }
