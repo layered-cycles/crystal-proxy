@@ -18,7 +18,7 @@ module.exports = {
   },
   output: {
     filename: '[name].js',
-    path: Path.resolve(__dirname, './Stage/Crystal.app/Contents/Resources')
+    path: Path.resolve(__dirname, './Stage')
   },
   module: {
     rules: [

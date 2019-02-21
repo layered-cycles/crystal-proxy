@@ -6,49 +6,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationDidFinishLaunching(
     _ notification: Notification) 
   {
-    let mainMenu = NSMenu()
-    let rowMenuItem = NSMenuItem(
-      title: "", 
-      action: nil, 
-      keyEquivalent: "")
-    let columnMenu = NSMenu()
-    columnMenu.addItem(
-      withTitle: "About", 
-      action: #selector(self.displayAboutPanel), 
-      keyEquivalent: "")
-    columnMenu.addItem(NSMenuItem.separator())
-    columnMenu.addItem(
-      withTitle: "Quit", 
-      action: #selector(NSApplication.terminate(_:)), 
-      keyEquivalent: "q")
-    rowMenuItem.submenu = columnMenu
-    mainMenu.addItem(rowMenuItem)
-    NSApp.mainMenu = mainMenu
-    NSApp.setActivationPolicy(.regular)
+    NSApp.setActivationPolicy(.accessory)
     NSApp.activate(
       ignoringOtherApps: true)    
-    let coreProxyScriptURL = Bundle.main.resourceURL!.appendingPathComponent("proxy-core.js")
-    let coreProxyScript = try! String(
-      contentsOf: coreProxyScriptURL, 
-      encoding: .utf8)
     JavaScriptEngine.launch(
-      script: coreProxyScript,
+      script: ClientService.proxyCoreScript,
       with: [
         ConsoleService.javaScriptService,
         self.clientService.javaScriptService,
         CrystalService.javaScriptService
       ])    
     self.clientService.windowController.showWindow(nil)
-  }
-
-  @objc func displayAboutPanel() {
-    if #available(macOS 10.13, *) {      
-      NSApplication.shared.orderFrontStandardAboutPanel(
-        options: [
-          NSApplication.AboutPanelOptionKey.applicationIcon: NSRunningApplication.current.icon!,
-          NSApplication.AboutPanelOptionKey.applicationVersion: "0.1.0"
-        ])
-    }
   }
 }
 

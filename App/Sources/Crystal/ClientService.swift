@@ -15,7 +15,7 @@ let LIGHT_WHITE = NSColor(
   blue: 246.0/255, 
   alpha: 1.0)
 
-final class ClientService {
+final class ClientService: ClientServiceAssetProvider {
   var windowController: WindowController!
 
   func _downloadFrameImage(
@@ -149,7 +149,41 @@ extension ClientService: StatefulCoreService {
   }
 }
 
-final class WindowController: NSWindowController {
+protocol ClientServiceAssetProvider {
+  static var proxyCoreScript: String { get }
+  static var mainLoadingScript: String { get }
+  static var mainWidgetScript: String { get }
+  static var noImageDisplayScript: String { get }
+}
+
+extension ClientServiceAssetProvider {
+  static var proxyCoreScript: String { 
+    let proxyCoreScriptURL = Bundle.main.resourceURL!.appendingPathComponent("proxy-core.js")
+    return try! String(
+      contentsOf: proxyCoreScriptURL, 
+      encoding: .utf8) 
+  }
+
+  static var mainLoadingScript: String { 
+    let mainLoadingScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.loading.js")
+    return try! String(
+      contentsOf: mainLoadingScriptUrl)
+  }
+
+  static var mainWidgetScript: String { 
+    let mainWidgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.widget.js")
+    return try! String(
+      contentsOf: mainWidgetScriptUrl)
+  }
+
+  static var noImageDisplayScript: String { 
+    let noImageDisplayScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("noimage.display.js")
+    return try! String(
+      contentsOf: noImageDisplayScriptUrl)
+  }
+}
+
+final class WindowController: NSWindowController, NSWindowDelegate {
   let imageController = ImageController()
   let mainController = MainController()  
 
@@ -161,6 +195,7 @@ final class WindowController: NSWindowController {
     mainWindow.title = ""
     let rawWindowStyleValue = 
       NSWindow.StyleMask.titled.rawValue |
+      NSWindow.StyleMask.closable.rawValue |
       NSWindow.StyleMask.miniaturizable.rawValue
     mainWindow.styleMask = NSWindow.StyleMask(
       rawValue: rawWindowStyleValue)
@@ -171,9 +206,16 @@ final class WindowController: NSWindowController {
     let mainWindowAnchor = NSPoint(
         x: 8, 
         y: NSScreen.main!.frame.height - 32)
-    mainWindow.setFrameTopLeftPoint(mainWindowAnchor)
+    mainWindow.setFrameTopLeftPoint(mainWindowAnchor)    
     super.init(
       window: mainWindow)        
+    mainWindow.delegate = self
+  }
+
+  func windowWillClose(
+    _ notification: Notification) 
+  {
+    NSApp.terminate(self)
   }
 
   func launchImageWindow() {    
@@ -266,14 +308,8 @@ final class MainController: NSViewController, WKUIDelegate {
     self.webView.autoresizingMask = NSView.AutoresizingMask(
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
-    let loaderScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.loading.js")
-    let loaderScript = try! String(
-      contentsOf: loaderScriptUrl)
-    self.webView.evaluateJavaScript(loaderScript)
-    let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("main.widget.js")
-    let widgetScript = try! String(
-      contentsOf: widgetScriptUrl)
-    self.webView.evaluateJavaScript(widgetScript)
+    self.webView.evaluateJavaScript(ClientService.mainLoadingScript)
+    self.webView.evaluateJavaScript(ClientService.mainWidgetScript)
     self.view = self.webView
   }
 
@@ -324,10 +360,7 @@ final class ImageController: NSViewController, WKUIDelegate {
     self.webView.autoresizingMask = NSView.AutoresizingMask(
       rawValue: rawViewResizingValue)
     self.webView.uiDelegate = self  
-    let widgetScriptUrl = Bundle.main.resourceURL!.appendingPathComponent("noimage.display.js")
-    let widgetScript = try! String(
-      contentsOf: widgetScriptUrl)
-    self.webView.evaluateJavaScript(widgetScript)
+    self.webView.evaluateJavaScript(ClientService.noImageDisplayScript)
     self.view.addSubview(self.webView)
     if #available(macOS 10.12, *) {
       let emptyImage = NSImage()
@@ -339,7 +372,7 @@ final class ImageController: NSViewController, WKUIDelegate {
   init() {
     super.init(
       nibName: nil, 
-      bundle: nil)      
+      bundle: nil)
   }
 
   required init?(
