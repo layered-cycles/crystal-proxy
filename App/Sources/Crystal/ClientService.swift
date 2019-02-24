@@ -38,7 +38,6 @@ final class ClientService: ClientServiceAssetProvider {
               maybeImageData in
               guard let imageData = maybeImageData 
               else { return }
-              if imageData.isEmpty { return }
               try! imageData.write(
                 to: savePanel.url!,
                 options: [.atomic])
