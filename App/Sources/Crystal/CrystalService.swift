@@ -30,7 +30,7 @@ enum CrystalService {
     serviceUrlString: String, 
     frameDimensions: [String: Double], 
     frameLayers: [AnyObject],
-    completionHandler: @escaping (Data) -> ()) 
+    completionHandler: @escaping (Data?) -> ()) 
   {
     Alamofire
       .request("\(serviceUrlString)/api", 
@@ -47,7 +47,12 @@ enum CrystalService {
       .response 
     { 
       alamoResponse in
-      completionHandler(alamoResponse.data!)
+      let successfulRequest = alamoResponse.response!.statusCode == 200 
+      let layersExist = frameLayers.count > 0
+      let maybeImageData = successfulRequest && layersExist
+        ? alamoResponse.data
+        : nil
+      completionHandler(maybeImageData)
     }
   }
 }

@@ -35,7 +35,9 @@ final class ClientService: ClientServiceAssetProvider {
             serviceUrlString: serviceUrlString,
             frameDimensions: frameDimensions, 
             frameLayers: frameLayers) {
-              imageData in
+              maybeImageData in
+              guard let imageData = maybeImageData 
+              else { return }
               if imageData.isEmpty { return }
               try! imageData.write(
                 to: savePanel.url!,
@@ -55,8 +57,9 @@ final class ClientService: ClientServiceAssetProvider {
       serviceUrlString: serviceUrlString,
       frameDimensions: frameDimensions, 
       frameLayers: frameLayers) {
-        nextImageData in        
-        if nextImageData.isEmpty || frameLayers.count == 0 {
+        maybeImageData in   
+        guard let nextImageData = maybeImageData 
+        else {
           self.windowController.displayNoImage(
             frameDimensions: frameDimensions)
           return 
