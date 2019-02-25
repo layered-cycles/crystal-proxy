@@ -47,7 +47,7 @@ enum CrystalService {
       .response 
     { 
       alamoResponse in
-      let successfulRequest = alamoResponse.response!.statusCode == 200 
+      let successfulRequest = alamoResponse.response?.statusCode == 200 
       let layersExist = frameLayers.count > 0
       let maybeImageData = successfulRequest && layersExist
         ? alamoResponse.data
